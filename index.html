@@ -14,7 +14,7 @@ h1{font-size:24px;font-weight:700;margin-bottom:4px;color:#fff}
 .status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#34a853}
 .status-text{font-size:12px;color:#888}
 .section{background:linear-gradient(135deg,#1a1d27,#252833);border-radius:16px;padding:24px;margin-bottom:24px;border:1px solid #2a2d3a}
-.section-title{font-size:18px;font-weight:700;color:#fff;margin-bottom:4px}
+.section-title{font-size:18px;font-weight:700;color:#fff;margin-bottom:16px}
 .section-sub{font-size:13px;color:#888;margin-bottom:20px}
 .total-number{font-size:56px;font-weight:800;color:#fff;line-height:1}
 .total-label{font-size:14px;color:#888;margin-top:4px;margin-bottom:16px}
@@ -53,14 +53,11 @@ h1{font-size:24px;font-weight:700;margin-bottom:4px;color:#fff}
 .slot-ring-bg{fill:none;stroke:#1f2230;stroke-width:8}
 .slot-ring-fill{fill:none;stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset 0.8s ease}
 .legend{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:24px}
-
-/* Plan-Fact */
 .pf-card{background:#0f1117;border-radius:14px;padding:20px;text-align:center}
 .pf-name{font-size:14px;font-weight:600;color:#fff;margin-bottom:12px}
 .pf-nums{display:flex;justify-content:center;align-items:baseline;gap:6px;margin-bottom:8px}
 .pf-fact{font-size:36px;font-weight:800}
 .pf-plan{font-size:18px;color:#666}
-.pf-label{font-size:11px;color:#666;margin-top:4px}
 .pf-bar-bg{height:10px;border-radius:5px;background:#1f2230;overflow:hidden;margin-top:10px}
 .pf-bar-fill{height:100%;border-radius:5px;transition:width 0.6s}
 .pf-total-card{background:#0f1117;border-radius:14px;padding:20px;margin-bottom:16px}
@@ -113,7 +110,7 @@ var TEAMS=[
 ];
 
 var VALID_STATUSES=["Working","Test Period","Probation","On-boarding"];
-var FACT_STATUSES=["Working","Test Period","Probation"];
+var FACT_STATUSES=["Working","Test Period"];
 var STATUS_COLORS={"Working":"#34a853","Test Period":"#b39ddb","Probation":"#fbbc04","On-boarding":"#4fc3f7"};
 
 var PLAN_ROWS={total:96,Florencia:97,Misael:98,Belen:99};
@@ -245,9 +242,7 @@ function render(){
   // ===== PLAN-FACT SECTION =====
   html+='<div class="section">';
   html+='<div class="section-title">📋 План — Факт</div>';
-  html+='<div class="section-sub">Working + Test Period + Probation vs План</div>';
 
-  // Total plan-fact
   var totalPlan=plans.total;
   var totalFactPct=totalPlan>0?Math.round(grandFact/totalPlan*100):0;
   var totalPfCol=getPfColor(totalFactPct);
@@ -261,21 +256,16 @@ function render(){
   html+='<div class="pf-bar-bg"><div class="pf-bar-fill" style="width:'+Math.min(totalFactPct,100)+'%;background:'+totalPfCol+'"></div></div>';
   html+='</div>';
 
-  // Per-team plan-fact cards
   html+='<div class="grid3">';
   teamData.forEach(function(team){
     var plan=plans[team.name]||0;
     var pct=plan>0?Math.round(team.fact/plan*100):0;
     var col=getPfColor(pct);
-    var diff=team.fact-plan;
-    var diffStr=diff>=0?"+"+diff:""+diff;
-    var diffCol=diff>=0?"#34a853":"#ea4335";
 
     html+='<div class="pf-card">';
     html+='<div class="pf-name">'+esc(team.name)+'</div>';
     html+='<div class="pf-nums"><span class="pf-fact" style="color:'+col+'">'+team.fact+'</span><span class="pf-plan">/ '+plan+'</span></div>';
     html+='<div style="font-size:20px;font-weight:700;color:'+col+'">'+pct+'%</div>';
-    html+='<div style="font-size:13px;color:'+diffCol+';margin-top:4px">'+diffStr+' от плана</div>';
     html+='<div class="pf-bar-bg"><div class="pf-bar-fill" style="width:'+Math.min(pct,100)+'%;background:'+col+'"></div></div>';
     html+='</div>';
   });

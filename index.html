@@ -20,7 +20,7 @@ h1{font-size:24px;font-weight:700;margin-bottom:4px;color:#fff}
 .total-stat{background:#1a1d27;border-radius:12px;padding:12px 20px;border:1px solid #2a2d3a;min-width:120px}
 .total-stat .num{font-size:24px;font-weight:700}
 .total-stat .lbl{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px}
-.teams{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+.teams{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px}
 .team-card{background:#1a1d27;border-radius:16px;padding:20px;border:1px solid #2a2d3a;transition:transform 0.2s}
 .team-card:hover{transform:translateY(-2px)}
 .team-name{font-size:16px;font-weight:700;color:#fff;margin-bottom:4px}
@@ -39,8 +39,6 @@ h1{font-size:24px;font-weight:700;margin-bottom:4px;color:#fff}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 .error-box{background:#2a1515;border:1px solid #5a2020;border-radius:12px;padding:20px;margin:20px 0}
 @media(max-width:700px){.teams{grid-template-columns:1fr}.slots-grid{grid-template-columns:1fr !important}}
-
-/* Login */
 .login-wrap{display:flex;justify-content:center;align-items:center;min-height:80vh}
 .login-box{background:#1a1d27;border:1px solid #2a2d3a;border-radius:16px;padding:40px;width:100%;max-width:380px;text-align:center}
 .login-box h2{font-size:20px;color:#fff;margin-bottom:8px}
@@ -50,13 +48,11 @@ h1{font-size:24px;font-weight:700;margin-bottom:4px;color:#fff}
 .login-btn{width:100%;padding:12px;border-radius:10px;border:none;background:#4285f4;color:#fff;font-size:14px;font-weight:600;cursor:pointer}
 .login-btn:hover{background:#3275e4}
 .login-error{color:#ea4335;font-size:13px;margin-top:8px;display:none}
-
-/* Slots section */
 .slots-section{background:linear-gradient(135deg,#1a1d27,#252833);border-radius:16px;padding:24px;margin-bottom:24px;border:1px solid #2a2d3a}
 .slots-title{font-size:18px;font-weight:700;color:#fff;margin-bottom:4px}
 .slots-week{font-size:13px;color:#888;margin-bottom:20px}
 .slots-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.slot-card{background:#0f1117;border-radius:14px;padding:20px;text-align:center;position:relative;overflow:hidden}
+.slot-card{background:#0f1117;border-radius:14px;padding:20px;text-align:center}
 .slot-name{font-size:14px;font-weight:600;color:#fff;margin-bottom:12px}
 .slot-ring-wrap{position:relative;width:100px;height:100px;margin:0 auto 12px}
 .slot-ring-bg{fill:none;stroke:#1f2230;stroke-width:8}
@@ -67,6 +63,7 @@ h1{font-size:24px;font-weight:700;margin-bottom:4px;color:#fff}
 .slot-total-label{font-size:13px;color:#888;margin-bottom:8px}
 .slot-total-nums{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
 .slot-total-big{font-size:28px;font-weight:800;color:#fff}
+.legend{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:24px}
 </style>
 </head>
 <body>
@@ -115,8 +112,8 @@ var TEAMS=[
 var VALID_STATUSES=["Working","Test Period","Probation","On-boarding"];
 var STATUS_COLORS={"Working":"#34a853","Test Period":"#b39ddb","Probation":"#fbbc04","On-boarding":"#4fc3f7"};
 
-var SLOT_ROWS=[89,90,91]; // 0-indexed: rows 90,91,92
-var WEEK_ROW=87; // 0-indexed: row 88
+var SLOT_ROWS=[89,90,91];
+var WEEK_ROW=87;
 
 var lastUpdate=null;
 var cachedData=null;
@@ -179,14 +176,11 @@ function fetchData(){
 }
 
 function ringSvg(pct,color){
-  var r=42;
-  var circ=2*Math.PI*r;
-  var offset=circ-(pct/100)*circ;
+  var r=42;var circ=2*Math.PI*r;var offset=circ-(pct/100)*circ;
   var svg='<svg width="100" height="100" viewBox="0 0 100 100">';
   svg+='<circle cx="50" cy="50" r="'+r+'" class="slot-ring-bg"/>';
   svg+='<circle cx="50" cy="50" r="'+r+'" class="slot-ring-fill" style="stroke:'+color+';stroke-dasharray:'+circ+';stroke-dashoffset:'+offset+'" transform="rotate(-90 50 50)"/>';
-  svg+='</svg>';
-  return svg;
+  svg+='</svg>';return svg;
 }
 
 function getSlotColor(pct){
@@ -211,7 +205,6 @@ function render(){
   });
 
   var slotData=parseSlots(rows);
-
   var html="";
 
   // Header
@@ -271,12 +264,18 @@ function render(){
   });
   html+='</div>';
 
+  // Legend — right after team cards
+  html+='<div class="legend">';
+  VALID_STATUSES.forEach(function(s){
+    html+='<div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#888"><div style="width:10px;height:10px;border-radius:3px;background:'+STATUS_COLORS[s]+'"></div>'+s+'</div>';
+  });
+  html+='</div>';
+
   // Slots section
   html+='<div class="slots-section">';
   html+='<div class="slots-title">🎯 Слоты для ролевок</div>';
   html+='<div class="slots-week">Текущая неделя: '+esc(slotData.week)+'</div>';
 
-  // Total slots summary
   var totalSlots=0,totalFilled=0;
   slotData.slots.forEach(function(s){totalSlots+=s.total;totalFilled+=s.filled});
   var totalPct=totalSlots>0?Math.round(totalFilled/totalSlots*100):0;
@@ -288,7 +287,6 @@ function render(){
   html+='<div class="progress-wrap"><div class="progress-bar" style="height:10px"><div class="progress-seg" style="width:'+totalPct+'%;background:'+totalColor+'"></div></div></div>';
   html+='</div>';
 
-  // Individual slot cards
   html+='<div class="slots-grid" style="margin-top:16px">';
   slotData.slots.forEach(function(s){
     var pctNum=s.total>0?Math.round(s.filled/s.total*100):0;
@@ -300,13 +298,6 @@ function render(){
     html+='</div>';
   });
   html+='</div>';
-  html+='</div>';
-
-  // Legend
-  html+='<div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:8px">';
-  VALID_STATUSES.forEach(function(s){
-    html+='<div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#888"><div style="width:10px;height:10px;border-radius:3px;background:'+STATUS_COLORS[s]+'"></div>'+s+'</div>';
-  });
   html+='</div>';
 
   document.getElementById("app").innerHTML=html;

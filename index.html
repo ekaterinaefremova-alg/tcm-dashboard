@@ -13,16 +13,18 @@ h1{font-size:24px;font-weight:700;margin-bottom:4px;color:#fff}
 .btn:hover{background:#252833}
 .status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#34a853}
 .status-text{font-size:12px;color:#888}
-.total-section{background:linear-gradient(135deg,#1a1d27,#252833);border-radius:16px;padding:24px;margin-bottom:24px;border:1px solid #2a2d3a}
+.section{background:linear-gradient(135deg,#1a1d27,#252833);border-radius:16px;padding:24px;margin-bottom:24px;border:1px solid #2a2d3a}
+.section-title{font-size:18px;font-weight:700;color:#fff;margin-bottom:4px}
+.section-sub{font-size:13px;color:#888;margin-bottom:20px}
 .total-number{font-size:56px;font-weight:800;color:#fff;line-height:1}
 .total-label{font-size:14px;color:#888;margin-top:4px;margin-bottom:16px}
 .total-statuses{display:flex;gap:16px;flex-wrap:wrap}
 .total-stat{background:#1a1d27;border-radius:12px;padding:12px 20px;border:1px solid #2a2d3a;min-width:120px}
 .total-stat .num{font-size:24px;font-weight:700}
 .total-stat .lbl{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px}
-.teams{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px}
-.team-card{background:#1a1d27;border-radius:16px;padding:20px;border:1px solid #2a2d3a;transition:transform 0.2s}
-.team-card:hover{transform:translateY(-2px)}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px}
+.card{background:#1a1d27;border-radius:16px;padding:20px;border:1px solid #2a2d3a;transition:transform 0.2s}
+.card:hover{transform:translateY(-2px)}
 .team-name{font-size:16px;font-weight:700;color:#fff;margin-bottom:4px}
 .team-total{font-size:36px;font-weight:800;color:#fff;margin-bottom:12px}
 .team-total-label{font-size:11px;color:#666;margin-bottom:12px}
@@ -38,7 +40,7 @@ h1{font-size:24px;font-weight:700;margin-bottom:4px;color:#fff}
 .spinner{font-size:36px;animation:pulse 1s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 .error-box{background:#2a1515;border:1px solid #5a2020;border-radius:12px;padding:20px;margin:20px 0}
-@media(max-width:700px){.teams{grid-template-columns:1fr}.slots-grid{grid-template-columns:1fr !important}}
+@media(max-width:700px){.grid3{grid-template-columns:1fr}}
 .login-wrap{display:flex;justify-content:center;align-items:center;min-height:80vh}
 .login-box{background:#1a1d27;border:1px solid #2a2d3a;border-radius:16px;padding:40px;width:100%;max-width:380px;text-align:center}
 .login-box h2{font-size:20px;color:#fff;margin-bottom:8px}
@@ -48,22 +50,23 @@ h1{font-size:24px;font-weight:700;margin-bottom:4px;color:#fff}
 .login-btn{width:100%;padding:12px;border-radius:10px;border:none;background:#4285f4;color:#fff;font-size:14px;font-weight:600;cursor:pointer}
 .login-btn:hover{background:#3275e4}
 .login-error{color:#ea4335;font-size:13px;margin-top:8px;display:none}
-.slots-section{background:linear-gradient(135deg,#1a1d27,#252833);border-radius:16px;padding:24px;margin-bottom:24px;border:1px solid #2a2d3a}
-.slots-title{font-size:18px;font-weight:700;color:#fff;margin-bottom:4px}
-.slots-week{font-size:13px;color:#888;margin-bottom:20px}
-.slots-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.slot-card{background:#0f1117;border-radius:14px;padding:20px;text-align:center}
-.slot-name{font-size:14px;font-weight:600;color:#fff;margin-bottom:12px}
-.slot-ring-wrap{position:relative;width:100px;height:100px;margin:0 auto 12px}
 .slot-ring-bg{fill:none;stroke:#1f2230;stroke-width:8}
 .slot-ring-fill{fill:none;stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset 0.8s ease}
-.slot-pct{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:24px;font-weight:800;color:#fff}
-.slot-detail{font-size:12px;color:#888;margin-top:4px}
-.slot-total-bar{margin-top:20px;background:#0f1117;border-radius:14px;padding:16px 20px}
-.slot-total-label{font-size:13px;color:#888;margin-bottom:8px}
-.slot-total-nums{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.slot-total-big{font-size:28px;font-weight:800;color:#fff}
 .legend{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:24px}
+
+/* Plan-Fact */
+.pf-card{background:#0f1117;border-radius:14px;padding:20px;text-align:center}
+.pf-name{font-size:14px;font-weight:600;color:#fff;margin-bottom:12px}
+.pf-nums{display:flex;justify-content:center;align-items:baseline;gap:6px;margin-bottom:8px}
+.pf-fact{font-size:36px;font-weight:800}
+.pf-plan{font-size:18px;color:#666}
+.pf-label{font-size:11px;color:#666;margin-top:4px}
+.pf-bar-bg{height:10px;border-radius:5px;background:#1f2230;overflow:hidden;margin-top:10px}
+.pf-bar-fill{height:100%;border-radius:5px;transition:width 0.6s}
+.pf-total-card{background:#0f1117;border-radius:14px;padding:20px;margin-bottom:16px}
+.pf-total-nums{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.pf-total-big{font-size:32px;font-weight:800}
+.pf-pct{font-size:28px;font-weight:800}
 </style>
 </head>
 <body>
@@ -110,8 +113,10 @@ var TEAMS=[
 ];
 
 var VALID_STATUSES=["Working","Test Period","Probation","On-boarding"];
+var FACT_STATUSES=["Working","Test Period","Probation"];
 var STATUS_COLORS={"Working":"#34a853","Test Period":"#b39ddb","Probation":"#fbbc04","On-boarding":"#4fc3f7"};
 
+var PLAN_ROWS={total:96,Florencia:97,Misael:98,Belen:99};
 var SLOT_ROWS=[89,90,91];
 var WEEK_ROW=87;
 
@@ -131,7 +136,7 @@ function matchStatus(status){
 }
 
 function parseTeam(rows,startRow,endRow){
-  var result={total:0,statuses:{}};
+  var result={total:0,fact:0,statuses:{}};
   VALID_STATUSES.forEach(function(s){result.statuses[s]=0});
   for(var i=startRow-1;i<endRow&&i<rows.length;i++){
     var row=rows[i]||[];
@@ -142,8 +147,20 @@ function parseTeam(rows,startRow,endRow){
     if(!matched)continue;
     result.total++;
     result.statuses[matched]++;
+    if(FACT_STATUSES.indexOf(matched)>=0)result.fact++;
   }
   return result;
+}
+
+function parsePlan(rows){
+  var plans={};
+  var names=["total","Florencia","Misael","Belen"];
+  names.forEach(function(n){
+    var rowIdx=PLAN_ROWS[n];
+    var row=rows[rowIdx]||[];
+    plans[n]=parseInt(String(row[1]||"0").replace(/[^0-9]/g,""))||0;
+  });
+  return plans;
 }
 
 function parseSlots(rows){
@@ -154,9 +171,8 @@ function parseSlots(rows){
     var name=String(row[0]||"").trim();
     var total=parseInt(String(row[1]||"0").replace(/[^0-9]/g,""))||0;
     var filled=parseInt(String(row[2]||"0").replace(/[^0-9]/g,""))||0;
-    var pct=String(row[3]||"").trim();
     if(!name)continue;
-    slots.push({name:name,total:total,filled:filled,pct:pct});
+    slots.push({name:name,total:total,filled:filled});
   }
   return{week:weekLabel,slots:slots};
 }
@@ -173,6 +189,12 @@ function fetchData(){
   }).catch(function(e){
     document.getElementById("app").innerHTML='<div class="error-box"><div style="font-size:18px;margin-bottom:8px">❌ Ошибка загрузки</div><div style="color:#f88">'+esc(e.message)+'</div><button class="btn" onclick="fetchData()" style="margin-top:12px">Попробовать снова</button></div>';
   });
+}
+
+function getPfColor(pct){
+  if(pct>=90)return"#34a853";
+  if(pct>=70)return"#fbbc04";
+  return"#ea4335";
 }
 
 function ringSvg(pct,color){
@@ -192,18 +214,20 @@ function getSlotColor(pct){
 function render(){
   if(!cachedData){fetchData();return}
   var rows=cachedData;
-  var teams=[];
-  var grandTotal=0;
+  var teamData=[];
+  var grandTotal=0;var grandFact=0;
   var grandStatuses={};
   VALID_STATUSES.forEach(function(s){grandStatuses[s]=0});
 
   TEAMS.forEach(function(t){
     var parsed=parseTeam(rows,t.startRow,t.endRow);
-    teams.push({name:t.name,total:parsed.total,statuses:parsed.statuses});
+    teamData.push({name:t.name,total:parsed.total,fact:parsed.fact,statuses:parsed.statuses});
     grandTotal+=parsed.total;
+    grandFact+=parsed.fact;
     VALID_STATUSES.forEach(function(s){grandStatuses[s]+=parsed.statuses[s]});
   });
 
+  var plans=parsePlan(rows);
   var slotData=parseSlots(rows);
   var html="";
 
@@ -218,8 +242,48 @@ function render(){
   html+='<button class="btn" onclick="fetchData()">🔄 Обновить</button>';
   html+='</div></div>';
 
-  // Total section
-  html+='<div class="total-section">';
+  // ===== PLAN-FACT SECTION =====
+  html+='<div class="section">';
+  html+='<div class="section-title">📋 План — Факт</div>';
+  html+='<div class="section-sub">Working + Test Period + Probation vs План</div>';
+
+  // Total plan-fact
+  var totalPlan=plans.total;
+  var totalFactPct=totalPlan>0?Math.round(grandFact/totalPlan*100):0;
+  var totalPfCol=getPfColor(totalFactPct);
+
+  html+='<div class="pf-total-card">';
+  html+='<div class="pf-total-nums">';
+  html+='<div><span class="pf-total-big" style="color:'+totalPfCol+'">'+grandFact+'</span><span style="color:#666;font-size:18px"> / '+totalPlan+'</span></div>';
+  html+='<div class="pf-pct" style="color:'+totalPfCol+'">'+totalFactPct+'%</div>';
+  html+='</div>';
+  html+='<div style="font-size:13px;color:#888;margin-bottom:8px">Общий факт / план</div>';
+  html+='<div class="pf-bar-bg"><div class="pf-bar-fill" style="width:'+Math.min(totalFactPct,100)+'%;background:'+totalPfCol+'"></div></div>';
+  html+='</div>';
+
+  // Per-team plan-fact cards
+  html+='<div class="grid3">';
+  teamData.forEach(function(team){
+    var plan=plans[team.name]||0;
+    var pct=plan>0?Math.round(team.fact/plan*100):0;
+    var col=getPfColor(pct);
+    var diff=team.fact-plan;
+    var diffStr=diff>=0?"+"+diff:""+diff;
+    var diffCol=diff>=0?"#34a853":"#ea4335";
+
+    html+='<div class="pf-card">';
+    html+='<div class="pf-name">'+esc(team.name)+'</div>';
+    html+='<div class="pf-nums"><span class="pf-fact" style="color:'+col+'">'+team.fact+'</span><span class="pf-plan">/ '+plan+'</span></div>';
+    html+='<div style="font-size:20px;font-weight:700;color:'+col+'">'+pct+'%</div>';
+    html+='<div style="font-size:13px;color:'+diffCol+';margin-top:4px">'+diffStr+' от плана</div>';
+    html+='<div class="pf-bar-bg"><div class="pf-bar-fill" style="width:'+Math.min(pct,100)+'%;background:'+col+'"></div></div>';
+    html+='</div>';
+  });
+  html+='</div>';
+  html+='</div>';
+
+  // ===== EMPLOYEES SECTION =====
+  html+='<div class="section">';
   html+='<div class="total-number">'+grandTotal+'</div>';
   html+='<div class="total-label">Всего сотрудников TCM</div>';
   html+='<div class="total-statuses">';
@@ -238,9 +302,9 @@ function render(){
   html+='</div>';
 
   // Team cards
-  html+='<div class="teams">';
-  teams.forEach(function(team){
-    html+='<div class="team-card">';
+  html+='<div class="grid3">';
+  teamData.forEach(function(team){
+    html+='<div class="card">';
     html+='<div class="team-name">'+esc(team.name)+'</div>';
     html+='<div class="team-total">'+team.total+'</div>';
     html+='<div class="team-total-label">сотрудников</div>';
@@ -264,37 +328,37 @@ function render(){
   });
   html+='</div>';
 
-  // Legend — right after team cards
+  // Legend
   html+='<div class="legend">';
   VALID_STATUSES.forEach(function(s){
     html+='<div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#888"><div style="width:10px;height:10px;border-radius:3px;background:'+STATUS_COLORS[s]+'"></div>'+s+'</div>';
   });
   html+='</div>';
 
-  // Slots section
-  html+='<div class="slots-section">';
-  html+='<div class="slots-title">🎯 Слоты для ролевок</div>';
-  html+='<div class="slots-week">Текущая неделя: '+esc(slotData.week)+'</div>';
+  // ===== SLOTS SECTION =====
+  html+='<div class="section">';
+  html+='<div class="section-title">🎯 Слоты для ролевок</div>';
+  html+='<div class="section-sub">Текущая неделя: '+esc(slotData.week)+'</div>';
 
   var totalSlots=0,totalFilled=0;
   slotData.slots.forEach(function(s){totalSlots+=s.total;totalFilled+=s.filled});
-  var totalPct=totalSlots>0?Math.round(totalFilled/totalSlots*100):0;
-  var totalColor=getSlotColor(totalPct);
+  var totalSlotPct=totalSlots>0?Math.round(totalFilled/totalSlots*100):0;
+  var totalSlotCol=getSlotColor(totalSlotPct);
 
-  html+='<div class="slot-total-bar">';
-  html+='<div class="slot-total-nums"><div><span class="slot-total-big" style="color:'+totalColor+'">'+totalFilled+'</span><span style="color:#666;font-size:16px"> / '+totalSlots+'</span></div><div style="font-size:24px;font-weight:800;color:'+totalColor+'">'+totalPct+'%</div></div>';
-  html+='<div class="slot-total-label">Общая заполняемость</div>';
-  html+='<div class="progress-wrap"><div class="progress-bar" style="height:10px"><div class="progress-seg" style="width:'+totalPct+'%;background:'+totalColor+'"></div></div></div>';
+  html+='<div class="pf-total-card">';
+  html+='<div class="pf-total-nums"><div><span class="pf-total-big" style="color:'+totalSlotCol+'">'+totalFilled+'</span><span style="color:#666;font-size:16px"> / '+totalSlots+'</span></div><div class="pf-pct" style="color:'+totalSlotCol+'">'+totalSlotPct+'%</div></div>';
+  html+='<div style="font-size:13px;color:#888;margin-bottom:8px">Общая заполняемость</div>';
+  html+='<div class="pf-bar-bg" style="height:10px"><div class="pf-bar-fill" style="width:'+totalSlotPct+'%;background:'+totalSlotCol+'"></div></div>';
   html+='</div>';
 
-  html+='<div class="slots-grid" style="margin-top:16px">';
+  html+='<div class="grid3" style="margin-top:16px">';
   slotData.slots.forEach(function(s){
     var pctNum=s.total>0?Math.round(s.filled/s.total*100):0;
     var color=getSlotColor(pctNum);
-    html+='<div class="slot-card">';
-    html+='<div class="slot-name">'+esc(s.name)+'</div>';
-    html+='<div class="slot-ring-wrap">'+ringSvg(pctNum,color)+'<div class="slot-pct" style="color:'+color+'">'+pctNum+'%</div></div>';
-    html+='<div class="slot-detail">'+s.filled+' из '+s.total+' слотов</div>';
+    html+='<div class="pf-card">';
+    html+='<div class="pf-name">'+esc(s.name)+'</div>';
+    html+='<div style="position:relative;width:100px;height:100px;margin:0 auto 12px">'+ringSvg(pctNum,color)+'<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:24px;font-weight:800;color:'+color+'">'+pctNum+'%</div></div>';
+    html+='<div style="font-size:12px;color:#888">'+s.filled+' из '+s.total+' слотов</div>';
     html+='</div>';
   });
   html+='</div>';

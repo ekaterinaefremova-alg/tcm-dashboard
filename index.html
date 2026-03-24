@@ -67,11 +67,10 @@ h1{font-size:24px;font-weight:700;margin-bottom:4px;color:#fff}
 </style>
 </head>
 <body>
-
 <div id="login">
 <div class="login-wrap">
 <div class="login-box">
-<h2>🔒 TCM Dashboard</h2>
+<h2>&#128274; TCM Dashboard</h2>
 <p>Введите пароль для доступа</p>
 <input type="password" class="login-input" id="passInput" placeholder="Пароль" onkeydown="if(event.key==='Enter')checkPass()">
 <button class="login-btn" onclick="checkPass()">Войти</button>
@@ -79,34 +78,32 @@ h1{font-size:24px;font-weight:700;margin-bottom:4px;color:#fff}
 </div>
 </div>
 </div>
-
 <div id="app" style="display:none">
-<div class="loading"><div class="spinner">⏳</div>
+<div class="loading"><div class="spinner">&#9203;</div>
 <div style="font-size:18px;font-weight:600;color:#888;margin-top:12px">Загрузка данных...</div></div>
 </div>
-
 <script>
 var PASS="tcmlatam2026";
 var API_KEY="AIzaSyCnzz6tG4bJCCyRuQ5oTddeDEpDg-PShko";
 var SPREADSHEET_ID="1gp8zaHuu_ctZeJnSpehLDaoYpDzzY5MvvmPdp9sp3Mk";
 
 function checkPass(){
-  var input=document.getElementById("passInput").value;
-  if(input===PASS){
-    document.getElementById("login").style.display="none";
-    document.getElementById("app").style.display="block";
-    fetchData();
-    setInterval(fetchData,60000);
-  }else{
-    document.getElementById("loginError").style.display="block";
-    document.getElementById("passInput").value="";
-  }
+var input=document.getElementById("passInput").value;
+if(input===PASS){
+document.getElementById("login").style.display="none";
+document.getElementById("app").style.display="block";
+fetchData();
+setInterval(fetchData,60000);
+}else{
+document.getElementById("loginError").style.display="block";
+document.getElementById("passInput").value="";
+}
 }
 
 var TEAMS=[
-  {name:"Florencia",startRow:2,endRow:24},
-  {name:"Misael",startRow:28,endRow:55},
-  {name:"Belen",startRow:59,endRow:86}
+{name:"Florencia",startRow:2,endRow:24},
+{name:"Misael",startRow:28,endRow:55},
+{name:"Belen",startRow:59,endRow:86}
 ];
 
 var VALID_STATUSES=["Working","Test Period","Probation","On-boarding"];
@@ -123,238 +120,229 @@ var cachedData=null;
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
 
 function matchStatus(status){
-  var s=status.toLowerCase();
-  if(s.indexOf("exit")>=0)return"";
-  if(s.indexOf("work")>=0)return"Working";
-  if(s.indexOf("test")>=0)return"Test Period";
-  if(s.indexOf("prob")>=0)return"Probation";
-  if(s.indexOf("on-bo")>=0||s.indexOf("onbo")>=0)return"On-boarding";
-  return"";
+var s=status.toLowerCase();
+if(s.indexOf("exit")>=0)return "";
+if(s.indexOf("work")>=0)return "Working";
+if(s.indexOf("test")>=0)return "Test Period";
+if(s.indexOf("prob")>=0)return "Probation";
+if(s.indexOf("on-bo")>=0||s.indexOf("onbo")>=0)return "On-boarding";
+return "";
 }
 
 function parseTeam(rows,startRow,endRow){
-  var result={total:0,fact:0,statuses:{}};
-  VALID_STATUSES.forEach(function(s){result.statuses[s]=0});
-  for(var i=startRow-1;i<endRow&&i<rows.length;i++){
-    var row=rows[i]||[];
-    var name=String(row[2]||"").trim();
-    var status=String(row[3]||"").trim();
-    if(!name)continue;
-    var matched=matchStatus(status);
-    if(!matched)continue;
-    result.total++;
-    result.statuses[matched]++;
-    if(FACT_STATUSES.indexOf(matched)>=0)result.fact++;
-  }
-  return result;
+var result={total:0,fact:0,statuses:{}};
+VALID_STATUSES.forEach(function(s){result.statuses[s]=0});
+for(var i=startRow-1;i<endRow&&i<rows.length;i++){
+var row=rows[i]||[];
+var name=String(row[2]||"").trim();
+var status=String(row[3]||"").trim();
+if(!name)continue;
+var matched=matchStatus(status);
+if(!matched)continue;
+result.total++;
+result.statuses[matched]++;
+if(FACT_STATUSES.indexOf(matched)>=0)result.fact++;
+}
+return result;
 }
 
 function parsePlan(rows){
-  var plans={};
-  var names=["total","Florencia","Misael","Belen"];
-  names.forEach(function(n){
-    var rowIdx=PLAN_ROWS[n];
-    var row=rows[rowIdx]||[];
-    plans[n]=parseInt(String(row[1]||"0").replace(/[^0-9]/g,""))||0;
-  });
-  return plans;
+var plans={};
+var names=["total","Florencia","Misael","Belen"];
+names.forEach(function(n){
+var rowIdx=PLAN_ROWS[n];
+var row=rows[rowIdx]||[];
+plans[n]=parseInt(String(row[1]||"0").replace(/[^0-9]/g,""))||0;
+});
+return plans;
 }
 
 function parseSlots(rows){
-  var weekLabel=String((rows[WEEK_ROW]||[])[0]||"").trim();
-  var slots=[];
-  for(var i=0;i<SLOT_ROWS.length;i++){
-    var row=rows[SLOT_ROWS[i]]||[];
-    var name=String(row[0]||"").trim();
-    var total=parseInt(String(row[1]||"0").replace(/[^0-9]/g,""))||0;
-    var filled=parseInt(String(row[2]||"0").replace(/[^0-9]/g,""))||0;
-    if(!name)continue;
-    slots.push({name:name,total:total,filled:filled});
-  }
-  return{week:weekLabel,slots:slots};
+var weekLabel=String((rows[WEEK_ROW]||[])[0]||"").trim();
+var slots=[];
+for(var i=0;i<SLOT_ROWS.length;i++){
+var row=rows[SLOT_ROWS[i]]||[];
+var name=String(row[0]||"").trim();
+var total=parseInt(String(row[1]||"0").replace(/[^0-9]/g,""))||0;
+var filled=parseInt(String(row[2]||"0").replace(/[^0-9]/g,""))||0;
+if(!name)continue;
+slots.push({name:name,total:total,filled:filled});
+}
+return {week:weekLabel,slots:slots};
 }
 
 function fetchData(){
-  var url="https://sheets.googleapis.com/v4/spreadsheets/"+SPREADSHEET_ID+"/values/Employee%20list?key="+API_KEY;
-  fetch(url).then(function(res){
-    if(!res.ok)return res.json().then(function(e){throw new Error(e&&e.error?e.error.message:"HTTP "+res.status)});
-    return res.json();
-  }).then(function(json){
-    cachedData=json.values||[];
-    lastUpdate=new Date();
-    render();
-  }).catch(function(e){
-    document.getElementById("app").innerHTML='<div class="error-box"><div style="font-size:18px;margin-bottom:8px">❌ Ошибка загрузки</div><div style="color:#f88">'+esc(e.message)+'</div><button class="btn" onclick="fetchData()" style="margin-top:12px">Попробовать снова</button></div>';
-  });
+var url="https://sheets.googleapis.com/v4/spreadsheets/"+SPREADSHEET_ID+"/values/Employee%20list?key="+API_KEY;
+fetch(url).then(function(res){
+if(!res.ok)return res.json().then(function(e){throw new Error(e&&e.error?e.error.message:"HTTP "+res.status)});
+return res.json();
+}).then(function(json){
+cachedData=json.values||[];
+lastUpdate=new Date();
+render();
+}).catch(function(e){
+document.getElementById("app").innerHTML='<div class="error-box"><div style="font-size:18px;margin-bottom:8px">&#10060; Ошибка загрузки</div><div style="color:#f88">'+esc(e.message)+'</div><button class="btn" onclick="fetchData()" style="margin-top:12px">Попробовать снова</button></div>';
+});
 }
 
 function getPfColor(pct){
-  if(pct>=90)return"#34a853";
-  if(pct>=70)return"#fbbc04";
-  return"#ea4335";
+if(pct>=90)return "#34a853";
+if(pct>=70)return "#fbbc04";
+return "#ea4335";
 }
 
 function ringSvg(pct,color){
-  var r=42;var circ=2*Math.PI*r;var offset=circ-(pct/100)*circ;
-  var svg='<svg width="100" height="100" viewBox="0 0 100 100">';
-  svg+='<circle cx="50" cy="50" r="'+r+'" class="slot-ring-bg"/>';
-  svg+='<circle cx="50" cy="50" r="'+r+'" class="slot-ring-fill" style="stroke:'+color+';stroke-dasharray:'+circ+';stroke-dashoffset:'+offset+'" transform="rotate(-90 50 50)"/>';
-  svg+='</svg>';return svg;
+var r=42;var circ=2*Math.PI*r;var offset=circ-(pct/100)*circ;
+return '<svg width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="'+r+'" class="slot-ring-bg"/><circle cx="50" cy="50" r="'+r+'" class="slot-ring-fill" style="stroke:'+color+';stroke-dasharray:'+circ+';stroke-dashoffset:'+offset+'" transform="rotate(-90 50 50)"/></svg>';
 }
 
 function getSlotColor(pct){
-  if(pct>=80)return"#34a853";
-  if(pct>=50)return"#fbbc04";
-  return"#ea4335";
+if(pct>=80)return "#34a853";
+if(pct>=50)return "#fbbc04";
+return "#ea4335";
 }
 
 function render(){
-  if(!cachedData){fetchData();return}
-  var rows=cachedData;
-  var teamData=[];
-  var grandTotal=0;var grandFact=0;
-  var grandStatuses={};
-  VALID_STATUSES.forEach(function(s){grandStatuses[s]=0});
+if(!cachedData){fetchData();return}
+var rows=cachedData;
+var teamData=[];
+var grandTotal=0;
+var grandFact=0;
+var grandStatuses={};
+VALID_STATUSES.forEach(function(s){grandStatuses[s]=0});
 
-  TEAMS.forEach(function(t){
-    var parsed=parseTeam(rows,t.startRow,t.endRow);
-    teamData.push({name:t.name,total:parsed.total,fact:parsed.fact,statuses:parsed.statuses});
-    grandTotal+=parsed.total;
-    grandFact+=parsed.fact;
-    VALID_STATUSES.forEach(function(s){grandStatuses[s]+=parsed.statuses[s]});
-  });
+TEAMS.forEach(function(t){
+var parsed=parseTeam(rows,t.startRow,t.endRow);
+teamData.push({name:t.name,total:parsed.total,fact:parsed.fact,statuses:parsed.statuses});
+grandTotal+=parsed.total;
+grandFact+=parsed.fact;
+VALID_STATUSES.forEach(function(s){grandStatuses[s]+=parsed.statuses[s]});
+});
 
-  var plans=parsePlan(rows);
-  var slotData=parseSlots(rows);
-  var html="";
+var plans=parsePlan(rows);
+var slotData=parseSlots(rows);
+var h="";
 
-  // Header
-  html+='<div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:8px;margin-bottom:20px">';
-  html+='<div><h1>📊 TCM Dashboard</h1><div class="subtitle">Команды TCM · Данные в реальном времени</div></div>';
-  html+='<div style="display:flex;align-items:center;gap:8px">';
-  if(lastUpdate){
-    html+='<div class="status-dot"></div>';
-    html+='<span class="status-text">Обновлено: '+lastUpdate.toLocaleTimeString("ru-RU")+'</span>';
-  }
-  html+='<button class="btn" onclick="fetchData()">🔄 Обновить</button>';
-  html+='</div></div>';
+h+='<div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:8px;margin-bottom:20px">';
+h+='<div><h1>&#128202; TCM Dashboard</h1><div class="subtitle">Команды TCM · Данные в реальном времени</div></div>';
+h+='<div style="display:flex;align-items:center;gap:8px">';
+if(lastUpdate){
+h+='<div class="status-dot"></div>';
+h+='<span class="status-text">Обновлено: '+lastUpdate.toLocaleTimeString("ru-RU")+'</span>';
+}
+h+='<button class="btn" onclick="fetchData()">&#128260; Обновить</button>';
+h+='</div></div>';
 
-  // ===== PLAN-FACT SECTION =====
-  html+='<div class="section">';
-  html+='<div class="section-title">📋 План — Факт</div>';
+h+='<div class="section">';
+h+='<div class="section-title">&#128203; Выполнение плана найма</div>';
 
-  var totalPlan=plans.total;
-  var totalFactPct=totalPlan>0?Math.round(grandFact/totalPlan*100):0;
-  var totalPfCol=getPfColor(totalFactPct);
+var totalPlan=plans.total;
+var totalFactPct=totalPlan>0?Math.round(grandFact/totalPlan*100):0;
+var totalPfCol=getPfColor(totalFactPct);
 
-  html+='<div class="pf-total-card">';
-  html+='<div class="pf-total-nums">';
-  html+='<div><span class="pf-total-big" style="color:'+totalPfCol+'">'+grandFact+'</span><span style="color:#666;font-size:18px"> / '+totalPlan+'</span></div>';
-  html+='<div class="pf-pct" style="color:'+totalPfCol+'">'+totalFactPct+'%</div>';
-  html+='</div>';
-  html+='<div style="font-size:13px;color:#888;margin-bottom:8px">Общий факт / план</div>';
-  html+='<div class="pf-bar-bg"><div class="pf-bar-fill" style="width:'+Math.min(totalFactPct,100)+'%;background:'+totalPfCol+'"></div></div>';
-  html+='</div>';
+h+='<div class="pf-total-card">';
+h+='<div class="pf-total-nums">';
+h+='<div><span class="pf-total-big" style="color:'+totalPfCol+'">'+grandFact+'</span><span style="color:#666;font-size:18px"> / '+totalPlan+'</span></div>';
+h+='<div class="pf-pct" style="color:'+totalPfCol+'">'+totalFactPct+'%</div>';
+h+='</div>';
+h+='<div style="font-size:13px;color:#888;margin-bottom:8px">Общий факт / план</div>';
+h+='<div class="pf-bar-bg"><div class="pf-bar-fill" style="width:'+Math.min(totalFactPct,100)+'%;background:'+totalPfCol+'"></div></div>';
+h+='</div>';
 
-  html+='<div class="grid3">';
-  teamData.forEach(function(team){
-    var plan=plans[team.name]||0;
-    var pct=plan>0?Math.round(team.fact/plan*100):0;
-    var col=getPfColor(pct);
+h+='<div class="grid3">';
+teamData.forEach(function(team){
+var plan=plans[team.name]||0;
+var pct=plan>0?Math.round(team.fact/plan*100):0;
+var col=getPfColor(pct);
+h+='<div class="pf-card">';
+h+='<div class="pf-name">'+esc(team.name)+'</div>';
+h+='<div class="pf-nums"><span class="pf-fact" style="color:'+col+'">'+team.fact+'</span><span class="pf-plan">/ '+plan+'</span></div>';
+h+='<div style="font-size:20px;font-weight:700;color:'+col+'">'+pct+'%</div>';
+h+='<div class="pf-bar-bg"><div class="pf-bar-fill" style="width:'+Math.min(pct,100)+'%;background:'+col+'"></div></div>';
+h+='</div>';
+});
+h+='</div>';
+h+='</div>';
 
-    html+='<div class="pf-card">';
-    html+='<div class="pf-name">'+esc(team.name)+'</div>';
-    html+='<div class="pf-nums"><span class="pf-fact" style="color:'+col+'">'+team.fact+'</span><span class="pf-plan">/ '+plan+'</span></div>';
-    html+='<div style="font-size:20px;font-weight:700;color:'+col+'">'+pct+'%</div>';
-    html+='<div class="pf-bar-bg"><div class="pf-bar-fill" style="width:'+Math.min(pct,100)+'%;background:'+col+'"></div></div>';
-    html+='</div>';
-  });
-  html+='</div>';
-  html+='</div>';
+h+='<div class="section">';
+h+='<div class="total-number">'+grandTotal+'</div>';
+h+='<div class="total-label">Всего сотрудников TCM</div>';
+h+='<div class="total-statuses">';
+VALID_STATUSES.forEach(function(s){
+h+='<div class="total-stat"><div class="num" style="color:'+STATUS_COLORS[s]+'">'+grandStatuses[s]+'</div><div class="lbl">'+s+'</div></div>';
+});
+h+='</div>';
+if(grandTotal>0){
+h+='<div class="progress-wrap"><div class="progress-bar">';
+VALID_STATUSES.forEach(function(s){
+var pct=grandStatuses[s]/grandTotal*100;
+if(pct>0)h+='<div class="progress-seg" style="width:'+pct+'%;background:'+STATUS_COLORS[s]+'"></div>';
+});
+h+='</div></div>';
+}
+h+='</div>';
 
-  // ===== EMPLOYEES SECTION =====
-  html+='<div class="section">';
-  html+='<div class="total-number">'+grandTotal+'</div>';
-  html+='<div class="total-label">Всего сотрудников TCM</div>';
-  html+='<div class="total-statuses">';
-  VALID_STATUSES.forEach(function(s){
-    html+='<div class="total-stat"><div class="num" style="color:'+STATUS_COLORS[s]+'">'+grandStatuses[s]+'</div><div class="lbl">'+s+'</div></div>';
-  });
-  html+='</div>';
-  if(grandTotal>0){
-    html+='<div class="progress-wrap"><div class="progress-bar">';
-    VALID_STATUSES.forEach(function(s){
-      var pct=grandStatuses[s]/grandTotal*100;
-      if(pct>0)html+='<div class="progress-seg" style="width:'+pct+'%;background:'+STATUS_COLORS[s]+'"></div>';
-    });
-    html+='</div></div>';
-  }
-  html+='</div>';
+h+='<div class="grid3">';
+teamData.forEach(function(team){
+h+='<div class="card">';
+h+='<div class="team-name">'+esc(team.name)+'</div>';
+h+='<div class="team-total">'+team.total+'</div>';
+h+='<div class="team-total-label">сотрудников</div>';
+VALID_STATUSES.forEach(function(s){
+if(team.statuses[s]>0){
+h+='<div class="status-row">';
+h+='<div class="status-name"><div class="status-badge" style="background:'+STATUS_COLORS[s]+'"></div>'+s+'</div>';
+h+='<div class="status-count" style="color:'+STATUS_COLORS[s]+'">'+team.statuses[s]+'</div>';
+h+='</div>';
+}
+});
+if(team.total>0){
+h+='<div class="progress-wrap"><div class="progress-bar">';
+VALID_STATUSES.forEach(function(s){
+var pct=team.statuses[s]/team.total*100;
+if(pct>0)h+='<div class="progress-seg" style="width:'+pct+'%;background:'+STATUS_COLORS[s]+'"></div>';
+});
+h+='</div></div>';
+}
+h+='</div>';
+});
+h+='</div>';
 
-  // Team cards
-  html+='<div class="grid3">';
-  teamData.forEach(function(team){
-    html+='<div class="card">';
-    html+='<div class="team-name">'+esc(team.name)+'</div>';
-    html+='<div class="team-total">'+team.total+'</div>';
-    html+='<div class="team-total-label">сотрудников</div>';
-    VALID_STATUSES.forEach(function(s){
-      if(team.statuses[s]>0){
-        html+='<div class="status-row">';
-        html+='<div class="status-name"><div class="status-badge" style="background:'+STATUS_COLORS[s]+'"></div>'+s+'</div>';
-        html+='<div class="status-count" style="color:'+STATUS_COLORS[s]+'">'+team.statuses[s]+'</div>';
-        html+='</div>';
-      }
-    });
-    if(team.total>0){
-      html+='<div class="progress-wrap"><div class="progress-bar">';
-      VALID_STATUSES.forEach(function(s){
-        var pct=team.statuses[s]/team.total*100;
-        if(pct>0)html+='<div class="progress-seg" style="width:'+pct+'%;background:'+STATUS_COLORS[s]+'"></div>';
-      });
-      html+='</div></div>';
-    }
-    html+='</div>';
-  });
-  html+='</div>';
+h+='<div class="legend">';
+VALID_STATUSES.forEach(function(s){
+h+='<div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#888"><div style="width:10px;height:10px;border-radius:3px;background:'+STATUS_COLORS[s]+'"></div>'+s+'</div>';
+});
+h+='</div>';
 
-  // Legend
-  html+='<div class="legend">';
-  VALID_STATUSES.forEach(function(s){
-    html+='<div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#888"><div style="width:10px;height:10px;border-radius:3px;background:'+STATUS_COLORS[s]+'"></div>'+s+'</div>';
-  });
-  html+='</div>';
+h+='<div class="section">';
+h+='<div class="section-title">&#127919; Слоты для ролевок</div>';
+h+='<div class="section-sub">Текущая неделя: '+esc(slotData.week)+'</div>';
 
-  // ===== SLOTS SECTION =====
-  html+='<div class="section">';
-  html+='<div class="section-title">🎯 Слоты для ролевок</div>';
-  html+='<div class="section-sub">Текущая неделя: '+esc(slotData.week)+'</div>';
+var totalSlots=0,totalFilled=0;
+slotData.slots.forEach(function(s){totalSlots+=s.total;totalFilled+=s.filled});
+var totalSlotPct=totalSlots>0?Math.round(totalFilled/totalSlots*100):0;
+var totalSlotCol=getSlotColor(totalSlotPct);
 
-  var totalSlots=0,totalFilled=0;
-  slotData.slots.forEach(function(s){totalSlots+=s.total;totalFilled+=s.filled});
-  var totalSlotPct=totalSlots>0?Math.round(totalFilled/totalSlots*100):0;
-  var totalSlotCol=getSlotColor(totalSlotPct);
+h+='<div class="pf-total-card">';
+h+='<div class="pf-total-nums"><div><span class="pf-total-big" style="color:'+totalSlotCol+'">'+totalFilled+'</span><span style="color:#666;font-size:16px"> / '+totalSlots+'</span></div><div class="pf-pct" style="color:'+totalSlotCol+'">'+totalSlotPct+'%</div></div>';
+h+='<div style="font-size:13px;color:#888;margin-bottom:8px">Общая заполняемость</div>';
+h+='<div class="pf-bar-bg" style="height:10px"><div class="pf-bar-fill" style="width:'+totalSlotPct+'%;background:'+totalSlotCol+'"></div></div>';
+h+='</div>';
 
-  html+='<div class="pf-total-card">';
-  html+='<div class="pf-total-nums"><div><span class="pf-total-big" style="color:'+totalSlotCol+'">'+totalFilled+'</span><span style="color:#666;font-size:16px"> / '+totalSlots+'</span></div><div class="pf-pct" style="color:'+totalSlotCol+'">'+totalSlotPct+'%</div></div>';
-  html+='<div style="font-size:13px;color:#888;margin-bottom:8px">Общая заполняемость</div>';
-  html+='<div class="pf-bar-bg" style="height:10px"><div class="pf-bar-fill" style="width:'+totalSlotPct+'%;background:'+totalSlotCol+'"></div></div>';
-  html+='</div>';
+h+='<div class="grid3" style="margin-top:16px">';
+slotData.slots.forEach(function(s){
+var pctNum=s.total>0?Math.round(s.filled/s.total*100):0;
+var color=getSlotColor(pctNum);
+h+='<div class="pf-card">';
+h+='<div class="pf-name">'+esc(s.name)+'</div>';
+h+='<div style="position:relative;width:100px;height:100px;margin:0 auto 12px">'+ringSvg(pctNum,color)+'<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:24px;font-weight:800;color:'+color+'">'+pctNum+'%</div></div>';
+h+='<div style="font-size:12px;color:#888">'+s.filled+' из '+s.total+' слотов</div>';
+h+='</div>';
+});
+h+='</div>';
+h+='</div>';
 
-  html+='<div class="grid3" style="margin-top:16px">';
-  slotData.slots.forEach(function(s){
-    var pctNum=s.total>0?Math.round(s.filled/s.total*100):0;
-    var color=getSlotColor(pctNum);
-    html+='<div class="pf-card">';
-    html+='<div class="pf-name">'+esc(s.name)+'</div>';
-    html+='<div style="position:relative;width:100px;height:100px;margin:0 auto 12px">'+ringSvg(pctNum,color)+'<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:24px;font-weight:800;color:'+color+'">'+pctNum+'%</div></div>';
-    html+='<div style="font-size:12px;color:#888">'+s.filled+' из '+s.total+' слотов</div>';
-    html+='</div>';
-  });
-  html+='</div>';
-  html+='</div>';
-
-  document.getElementById("app").innerHTML=html;
+document.getElementById("app").innerHTML=h;
 }
 </script>
 </body>

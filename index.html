@@ -38,9 +38,9 @@ h1{font-size:24px;font-weight:700;margin-bottom:4px;color:#fff}
 .spinner{font-size:36px;animation:pulse 1s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 .error-box{background:#2a1515;border:1px solid #5a2020;border-radius:12px;padding:20px;margin:20px 0}
-@media(max-width:700px){.teams{grid-template-columns:1fr}}
+@media(max-width:700px){.teams{grid-template-columns:1fr}.slots-grid{grid-template-columns:1fr !important}}
 
-/* Login screen */
+/* Login */
 .login-wrap{display:flex;justify-content:center;align-items:center;min-height:80vh}
 .login-box{background:#1a1d27;border:1px solid #2a2d3a;border-radius:16px;padding:40px;width:100%;max-width:380px;text-align:center}
 .login-box h2{font-size:20px;color:#fff;margin-bottom:8px}
@@ -50,6 +50,23 @@ h1{font-size:24px;font-weight:700;margin-bottom:4px;color:#fff}
 .login-btn{width:100%;padding:12px;border-radius:10px;border:none;background:#4285f4;color:#fff;font-size:14px;font-weight:600;cursor:pointer}
 .login-btn:hover{background:#3275e4}
 .login-error{color:#ea4335;font-size:13px;margin-top:8px;display:none}
+
+/* Slots section */
+.slots-section{background:linear-gradient(135deg,#1a1d27,#252833);border-radius:16px;padding:24px;margin-bottom:24px;border:1px solid #2a2d3a}
+.slots-title{font-size:18px;font-weight:700;color:#fff;margin-bottom:4px}
+.slots-week{font-size:13px;color:#888;margin-bottom:20px}
+.slots-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.slot-card{background:#0f1117;border-radius:14px;padding:20px;text-align:center;position:relative;overflow:hidden}
+.slot-name{font-size:14px;font-weight:600;color:#fff;margin-bottom:12px}
+.slot-ring-wrap{position:relative;width:100px;height:100px;margin:0 auto 12px}
+.slot-ring-bg{fill:none;stroke:#1f2230;stroke-width:8}
+.slot-ring-fill{fill:none;stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset 0.8s ease}
+.slot-pct{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:24px;font-weight:800;color:#fff}
+.slot-detail{font-size:12px;color:#888;margin-top:4px}
+.slot-total-bar{margin-top:20px;background:#0f1117;border-radius:14px;padding:16px 20px}
+.slot-total-label{font-size:13px;color:#888;margin-bottom:8px}
+.slot-total-nums{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.slot-total-big{font-size:28px;font-weight:800;color:#fff}
 </style>
 </head>
 <body>
@@ -96,13 +113,10 @@ var TEAMS=[
 ];
 
 var VALID_STATUSES=["Working","Test Period","Probation","On-boarding"];
+var STATUS_COLORS={"Working":"#34a853","Test Period":"#b39ddb","Probation":"#fbbc04","On-boarding":"#4fc3f7"};
 
-var STATUS_COLORS={
-  "Working":"#34a853",
-  "Test Period":"#b39ddb",
-  "Probation":"#fbbc04",
-  "On-boarding":"#4fc3f7"
-};
+var SLOT_ROWS=[89,90,91]; // 0-indexed: rows 90,91,92
+var WEEK_ROW=87; // 0-indexed: row 88
 
 var lastUpdate=null;
 var cachedData=null;
@@ -135,6 +149,21 @@ function parseTeam(rows,startRow,endRow){
   return result;
 }
 
+function parseSlots(rows){
+  var weekLabel=String((rows[WEEK_ROW]||[])[0]||"").trim();
+  var slots=[];
+  for(var i=0;i<SLOT_ROWS.length;i++){
+    var row=rows[SLOT_ROWS[i]]||[];
+    var name=String(row[0]||"").trim();
+    var total=parseInt(String(row[1]||"0").replace(/[^0-9]/g,""))||0;
+    var filled=parseInt(String(row[2]||"0").replace(/[^0-9]/g,""))||0;
+    var pct=String(row[3]||"").trim();
+    if(!name)continue;
+    slots.push({name:name,total:total,filled:filled,pct:pct});
+  }
+  return{week:weekLabel,slots:slots};
+}
+
 function fetchData(){
   var url="https://sheets.googleapis.com/v4/spreadsheets/"+SPREADSHEET_ID+"/values/Employee%20list?key="+API_KEY;
   fetch(url).then(function(res){
@@ -147,6 +176,23 @@ function fetchData(){
   }).catch(function(e){
     document.getElementById("app").innerHTML='<div class="error-box"><div style="font-size:18px;margin-bottom:8px">❌ Ошибка загрузки</div><div style="color:#f88">'+esc(e.message)+'</div><button class="btn" onclick="fetchData()" style="margin-top:12px">Попробовать снова</button></div>';
   });
+}
+
+function ringSvg(pct,color){
+  var r=42;
+  var circ=2*Math.PI*r;
+  var offset=circ-(pct/100)*circ;
+  var svg='<svg width="100" height="100" viewBox="0 0 100 100">';
+  svg+='<circle cx="50" cy="50" r="'+r+'" class="slot-ring-bg"/>';
+  svg+='<circle cx="50" cy="50" r="'+r+'" class="slot-ring-fill" style="stroke:'+color+';stroke-dasharray:'+circ+';stroke-dashoffset:'+offset+'" transform="rotate(-90 50 50)"/>';
+  svg+='</svg>';
+  return svg;
+}
+
+function getSlotColor(pct){
+  if(pct>=80)return"#34a853";
+  if(pct>=50)return"#fbbc04";
+  return"#ea4335";
 }
 
 function render(){
@@ -164,8 +210,11 @@ function render(){
     VALID_STATUSES.forEach(function(s){grandStatuses[s]+=parsed.statuses[s]});
   });
 
+  var slotData=parseSlots(rows);
+
   var html="";
 
+  // Header
   html+='<div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:8px;margin-bottom:20px">';
   html+='<div><h1>📊 TCM Dashboard</h1><div class="subtitle">Команды TCM · Данные в реальном времени</div></div>';
   html+='<div style="display:flex;align-items:center;gap:8px">';
@@ -176,6 +225,7 @@ function render(){
   html+='<button class="btn" onclick="fetchData()">🔄 Обновить</button>';
   html+='</div></div>';
 
+  // Total section
   html+='<div class="total-section">';
   html+='<div class="total-number">'+grandTotal+'</div>';
   html+='<div class="total-label">Всего сотрудников TCM</div>';
@@ -194,6 +244,7 @@ function render(){
   }
   html+='</div>';
 
+  // Team cards
   html+='<div class="teams">';
   teams.forEach(function(team){
     html+='<div class="team-card">';
@@ -220,6 +271,38 @@ function render(){
   });
   html+='</div>';
 
+  // Slots section
+  html+='<div class="slots-section">';
+  html+='<div class="slots-title">🎯 Слоты для ролевок</div>';
+  html+='<div class="slots-week">Текущая неделя: '+esc(slotData.week)+'</div>';
+
+  // Total slots summary
+  var totalSlots=0,totalFilled=0;
+  slotData.slots.forEach(function(s){totalSlots+=s.total;totalFilled+=s.filled});
+  var totalPct=totalSlots>0?Math.round(totalFilled/totalSlots*100):0;
+  var totalColor=getSlotColor(totalPct);
+
+  html+='<div class="slot-total-bar">';
+  html+='<div class="slot-total-nums"><div><span class="slot-total-big" style="color:'+totalColor+'">'+totalFilled+'</span><span style="color:#666;font-size:16px"> / '+totalSlots+'</span></div><div style="font-size:24px;font-weight:800;color:'+totalColor+'">'+totalPct+'%</div></div>';
+  html+='<div class="slot-total-label">Общая заполняемость</div>';
+  html+='<div class="progress-wrap"><div class="progress-bar" style="height:10px"><div class="progress-seg" style="width:'+totalPct+'%;background:'+totalColor+'"></div></div></div>';
+  html+='</div>';
+
+  // Individual slot cards
+  html+='<div class="slots-grid" style="margin-top:16px">';
+  slotData.slots.forEach(function(s){
+    var pctNum=s.total>0?Math.round(s.filled/s.total*100):0;
+    var color=getSlotColor(pctNum);
+    html+='<div class="slot-card">';
+    html+='<div class="slot-name">'+esc(s.name)+'</div>';
+    html+='<div class="slot-ring-wrap">'+ringSvg(pctNum,color)+'<div class="slot-pct" style="color:'+color+'">'+pctNum+'%</div></div>';
+    html+='<div class="slot-detail">'+s.filled+' из '+s.total+' слотов</div>';
+    html+='</div>';
+  });
+  html+='</div>';
+  html+='</div>';
+
+  // Legend
   html+='<div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:8px">';
   VALID_STATUSES.forEach(function(s){
     html+='<div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#888"><div style="width:10px;height:10px;border-radius:3px;background:'+STATUS_COLORS[s]+'"></div>'+s+'</div>';

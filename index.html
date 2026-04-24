@@ -101,7 +101,7 @@ document.getElementById("passInput").value="";
 }
 
 var TEAMS=[
-{name:"Florencia",startRow:2,endRow:24},
+{name:"Florencia",startRow:2,endRow:26},
 {name:"Misael",startRow:28,endRow:56},
 {name:"Belen",startRow:61,endRow:84}
 ];
@@ -125,7 +125,7 @@ if(s.indexOf("exit")>=0)return "";
 if(s.indexOf("work")>=0)return "Working";
 if(s.indexOf("test")>=0)return "Test Period";
 if(s.indexOf("prob")>=0)return "Probation";
-if(s.indexOf("on-bo")>=0||s.indexOf("onbo")>=0)return "On-boarding";
+if(s.indexOf("on")>=0&&s.indexOf("bo")>=0)return "On-boarding";
 return "";
 }
 

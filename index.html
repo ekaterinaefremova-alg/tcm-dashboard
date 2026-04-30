@@ -90,6 +90,8 @@ var TEAM_NAMES=["Florencia","Misael","Belen"];
 var VALID_STATUSES=["Working","Test Period","Probation","On-boarding"];
 var FACT_STATUSES=["Working","Test Period"];
 var STATUS_COLORS={"Working":"#34a853","Test Period":"#b39ddb","Probation":"#fbbc04","On-boarding":"#4fc3f7"};
+var lastUpdate=null;
+var cachedData=null;
 
 function checkPass(){
 var input=document.getElementById("passInput").value;
@@ -104,10 +106,13 @@ document.getElementById("passInput").value="";
 }
 }
 
-var lastUpdate=null;
-var cachedData=null;
-
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+
+function cell(row,col){
+if(!row)return "";
+if(col>=row.length)return "";
+return String(row[col]||"").trim();
+}
 
 function matchStatus(status){
 var s=status.toLowerCase();
@@ -122,22 +127,20 @@ return "";
 function findTeamBlocks(rows){
 var headerRows=[];
 for(var i=0;i<rows.length;i++){
-var a=String(rows[i][0]||"").trim();
-if(a==="\u2116"||a==="No"||a==="N\u00ba"||a==="\u2116"||a.toLowerCase()==="no"||a.toLowerCase()==="\u2116"){
-headerRows.push(i);
-}
+var a=cell(rows[i],0);
+if(a==="\u2116")headerRows.push(i);
 }
 var blocks=[];
 for(var j=0;j<headerRows.length&&j<3;j++){
 var start=headerRows[j]+1;
 var end;
 if(j+1<headerRows.length){
-end=headerRows[j+1]-1;
+end=headerRows[j+1]-2;
 }else{
 end=rows.length-1;
 for(var k=start;k<rows.length;k++){
-var cellA=String(rows[k][0]||"").trim().toLowerCase();
-if(cellA==="team lead"||cellA==="\u043f\u043b\u0430\u043d"){
+var a=cell(rows[k],0).toLowerCase();
+if(a==="team lead"||a==="\u043f\u043b\u0430\u043d"){
 end=k-1;
 break;
 }
@@ -152,9 +155,8 @@ function parseTeamBlock(rows,start,end){
 var result={total:0,fact:0,statuses:{}};
 VALID_STATUSES.forEach(function(s){result.statuses[s]=0});
 for(var i=start;i<=end&&i<rows.length;i++){
-var row=rows[i]||[];
-var name=String(row[2]||"").trim();
-var status=String(row[3]||"").trim();
+var name=cell(rows[i],2);
+var status=cell(rows[i],3);
 if(!name)continue;
 var matched=matchStatus(status);
 if(!matched)continue;
@@ -169,16 +171,18 @@ function findSlots(rows){
 var weekLabel="";
 var slots=[];
 for(var i=0;i<rows.length;i++){
-var a=String(rows[i][0]||"").trim().toLowerCase();
+var a=cell(rows[i],0).toLowerCase();
 if(a==="team lead"){
-weekLabel=String(rows[i-1]?rows[i-1][0]||"":"").trim();
-if(!weekLabel&&i>=2)weekLabel=String(rows[i-2]?rows[i-2][0]||"":"").trim();
-for(var j=i+1;j<rows.length&&j<=i+5;j++){
-var row=rows[j]||[];
-var nm=String(row[0]||"").trim();
+for(var w=i-1;w>=0&&w>=i-3;w--){
+var wl=cell(rows[w],0);
+if(wl){weekLabel=wl;break;}
+}
+for(var j=i+1;j<rows.length&&j<=i+10;j++){
+var nm=cell(rows[j],0);
 if(!nm)break;
-var total=parseInt(String(row[1]||"0").replace(/[^0-9]/g,""))||0;
-var filled=parseInt(String(row[2]||"0").replace(/[^0-9]/g,""))||0;
+if(nm.toLowerCase()==="team lead")continue;
+var total=parseInt(cell(rows[j],1).replace(/[^0-9]/g,""))||0;
+var filled=parseInt(cell(rows[j],2).replace(/[^0-9]/g,""))||0;
 slots.push({name:nm,total:total,filled:filled});
 }
 break;
@@ -190,12 +194,11 @@ return {week:weekLabel,slots:slots};
 function findPlan(rows){
 var plans={total:0,Florencia:0,Misael:0,Belen:0};
 for(var i=0;i<rows.length;i++){
-var a=String(rows[i][0]||"").trim().toLowerCase();
-if(a==="\u043f\u043b\u0430\u043d"){
-for(var j=i+1;j<rows.length&&j<=i+5;j++){
-var row=rows[j]||[];
-var label=String(row[0]||"").trim().toLowerCase();
-var val=parseInt(String(row[1]||"0").replace(/[^0-9]/g,""))||0;
+var a=cell(rows[i],0);
+if(a.toLowerCase()==="\u043f\u043b\u0430\u043d"){
+for(var j=i+1;j<rows.length&&j<=i+10;j++){
+var label=cell(rows[j],0).toLowerCase();
+var val=parseInt(cell(rows[j],1).replace(/[^0-9]/g,""))||0;
 if(label==="total")plans.total=val;
 if(label==="florencia")plans.Florencia=val;
 if(label==="misael")plans.Misael=val;
@@ -208,12 +211,23 @@ return plans;
 }
 
 function fetchData(){
-var url="https://sheets.googleapis.com/v4/spreadsheets/"+SPREADSHEET_ID+"/values/Employee%20list?key="+API_KEY;
+var url="https://sheets.googleapis.com/v4/spreadsheets/"+SPREADSHEET_ID+"/values/Employee%20list!A1:G200?key="+API_KEY;
 fetch(url).then(function(res){
 if(!res.ok)return res.json().then(function(e){throw new Error(e&&e.error?e.error.message:"HTTP "+res.status)});
 return res.json();
 }).then(function(json){
-cachedData=json.values||[];
+var rows=json.values||[];
+var padded=[];
+for(var i=0;i<200;i++){
+if(i<rows.length){
+var r=rows[i].slice();
+while(r.length<7)r.push("");
+padded.push(r);
+}else{
+padded.push(["","","","","","",""]);
+}
+}
+cachedData=padded;
 lastUpdate=new Date();
 render();
 }).catch(function(e){
@@ -234,7 +248,8 @@ if(!cachedData){fetchData();return}
 var rows=cachedData;
 var blocks=findTeamBlocks(rows);
 var teamData=[];
-var grandTotal=0;var grandFact=0;
+var grandTotal=0;
+var grandFact=0;
 var grandStatuses={};
 VALID_STATUSES.forEach(function(s){grandStatuses[s]=0});
 

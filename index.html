@@ -23,7 +23,6 @@ h1{font-size:24px;font-weight:700;margin-bottom:4px;color:#fff}
 .total-stat .num{font-size:24px;font-weight:700}
 .total-stat .lbl{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px}
 .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:16px}
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px}
 .card{background:#1a1d27;border-radius:16px;padding:20px;border:1px solid #2a2d3a;transition:transform 0.2s}
 .card:hover{transform:translateY(-2px)}
 .team-name{font-size:16px;font-weight:700;color:#fff;margin-bottom:4px}
@@ -42,7 +41,7 @@ h1{font-size:24px;font-weight:700;margin-bottom:4px;color:#fff}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 .error-box{background:#2a1515;border:1px solid #5a2020;border-radius:12px;padding:20px;margin:20px 0}
 @media(max-width:900px){.grid4{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:700px){.grid4{grid-template-columns:1fr}.grid3{grid-template-columns:1fr}}
+@media(max-width:700px){.grid4{grid-template-columns:1fr}}
 .login-wrap{display:flex;justify-content:center;align-items:center;min-height:80vh}
 .login-box{background:#1a1d27;border:1px solid #2a2d3a;border-radius:16px;padding:40px;width:100%;max-width:380px;text-align:center}
 .login-box h2{font-size:20px;color:#fff;margin-bottom:8px}
@@ -129,8 +128,10 @@ return "";
 function findTeamBlocks(rows){
 var headerRows=[];
 for(var i=0;i<rows.length;i++){
-var a=cell(rows[i],0);
-if(a==="\u2116")headerRows.push(i);
+var b=cell(rows[i],1).toLowerCase();
+if(b==="member type"){
+headerRows.push(i);
+}
 }
 var blocks=[];
 for(var j=0;j<headerRows.length&&j<TEAM_NAMES.length;j++){
@@ -175,7 +176,7 @@ var slots=[];
 for(var i=0;i<rows.length;i++){
 var a=cell(rows[i],0).toLowerCase();
 if(a==="team lead"){
-for(var w=i-1;w>=0&&w>=i-3;w--){
+for(var w=i-1;w>=0&&w>=i-5;w--){
 var wl=cell(rows[w],0);
 if(wl){weekLabel=wl;break;}
 }
@@ -265,8 +266,6 @@ VALID_STATUSES.forEach(function(s){grandStatuses[s]+=parsed.statuses[s]});
 
 var plans=findPlan(rows);
 var slotData=findSlots(rows);
-var teamCount=teamData.length;
-var gridClass=teamCount>3?"grid4":"grid3";
 var h="";
 
 h+='<div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:8px;margin-bottom:20px">';
@@ -287,7 +286,7 @@ h+='<div class="pf-pct" style="color:'+totalPfCol+'">'+totalFactPct+'%</div></di
 h+='<div style="font-size:13px;color:#888;margin-bottom:8px">Общий факт / план</div>';
 h+='<div class="pf-bar-bg"><div class="pf-bar-fill" style="width:'+Math.min(totalFactPct,100)+'%;background:'+totalPfCol+'"></div></div>';
 h+='</div>';
-h+='<div class="'+gridClass+'">';
+h+='<div class="grid4">';
 teamData.forEach(function(team){
 var plan=plans[team.name]||0;
 var pct=plan>0?Math.round(team.fact/plan*100):0;
@@ -310,7 +309,7 @@ VALID_STATUSES.forEach(function(s){var pct=grandStatuses[s]/grandTotal*100;if(pc
 h+='</div></div>';}
 h+='</div>';
 
-h+='<div class="'+gridClass+'">';
+h+='<div class="grid4">';
 teamData.forEach(function(team){
 h+='<div class="card"><div class="team-name">'+esc(team.name)+'</div>';
 h+='<div class="team-total">'+team.total+'</div><div class="team-total-label">сотрудников</div>';
@@ -336,7 +335,7 @@ var totalSlotCol=getSlotColor(totalSlotPct);
 h+='<div class="pf-total-card"><div class="pf-total-nums"><div><span class="pf-total-big" style="color:'+totalSlotCol+'">'+totalFilled+'</span><span style="color:#666;font-size:16px"> / '+totalSlots+'</span></div><div class="pf-pct" style="color:'+totalSlotCol+'">'+totalSlotPct+'%</div></div>';
 h+='<div style="font-size:13px;color:#888;margin-bottom:8px">Общая заполняемость</div>';
 h+='<div class="pf-bar-bg" style="height:10px"><div class="pf-bar-fill" style="width:'+totalSlotPct+'%;background:'+totalSlotCol+'"></div></div></div>';
-h+='<div class="'+gridClass+'" style="margin-top:16px">';
+h+='<div class="grid4" style="margin-top:16px">';
 slotData.slots.forEach(function(s){
 var pctNum=s.total>0?Math.round(s.filled/s.total*100):0;
 var color=getSlotColor(pctNum);

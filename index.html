@@ -81,6 +81,7 @@ h1{font-size:24px;font-weight:700;margin-bottom:4px;color:#fff}
 <div style="font-size:18px;font-weight:600;color:#888;margin-top:12px">Загрузка данных...</div></div>
 </div>
 <script>
+/* === CONFIG === */
 var PASS="tcmlatam2026";
 var API_KEY="AIzaSyCnzz6tG4bJCCyRuQ5oTddeDEpDg-PShko";
 var SPREADSHEET_ID="1gp8zaHuu_ctZeJnSpehLDaoYpDzzY5MvvmPdp9sp3Mk";
@@ -89,202 +90,186 @@ var TEAM_PLAN=14;
 var VALID_STATUSES=["Working","Test Period","Probation","On-boarding"];
 var FACT_STATUSES=["Working","Test Period"];
 var STATUS_COLORS={"Working":"#34a853","Test Period":"#b39ddb","Probation":"#fbbc04","On-boarding":"#4fc3f7"};
+/* === END CONFIG === */
+
 var lastUpdate=null;
 var cachedData=null;
 
 function checkPass(){
-var input=document.getElementById("passInput").value;
-if(input===PASS){
-document.getElementById("login").style.display="none";
-document.getElementById("app").style.display="block";
-fetchData();
-setInterval(fetchData,60000);
-}else{
-document.getElementById("loginError").style.display="block";
-document.getElementById("passInput").value="";
-}
+  var input=document.getElementById("passInput").value;
+  if(input===PASS){
+    document.getElementById("login").style.display="none";
+    document.getElementById("app").style.display="block";
+    fetchData();
+    setInterval(fetchData,60000);
+  }else{
+    document.getElementById("loginError").style.display="block";
+    document.getElementById("passInput").value="";
+  }
 }
 
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
 
 function cell(row,col){
-if(!row)return "";
-if(col>=row.length)return "";
-return String(row[col]||"").trim();
+  if(!row||col>=row.length)return "";
+  return String(row[col]||"").trim();
 }
 
 function matchStatus(status){
-var s=status.toLowerCase();
-if(s.indexOf("exit")>=0)return "";
-if(s.indexOf("work")>=0)return "Working";
-if(s.indexOf("test")>=0)return "Test Period";
-if(s.indexOf("prob")>=0)return "Probation";
-if(s.indexOf("on")>=0&&s.indexOf("bo")>=0)return "On-boarding";
-return "";
+  var s=status.toLowerCase();
+  if(s.indexOf("exit")>=0)return "";
+  if(s.indexOf("work")>=0)return "Working";
+  if(s.indexOf("test")>=0)return "Test Period";
+  if(s.indexOf("prob")>=0)return "Probation";
+  if(s.indexOf("on")>=0&&s.indexOf("bo")>=0)return "On-boarding";
+  return "";
 }
 
 function findTeamBlocks(rows){
-var headerRows=[];
-for(var i=0;i<rows.length;i++){
-var b=cell(rows[i],1).toLowerCase();
-if(b==="member type"){
-headerRows.push(i);
-}
-}
-var blocks=[];
-for(var j=0;j<headerRows.length&&j<TEAM_NAMES.length;j++){
-var start=headerRows[j]+1;
-var end;
-if(j+1<headerRows.length){
-end=headerRows[j+1]-2;
-}else{
-end=rows.length-1;
-for(var k=start;k<rows.length;k++){
-var a=cell(rows[k],0).toLowerCase();
-if(a==="\u043f\u043b\u0430\u043d"){
-end=k-1;
-break;
-}
-}
-}
-blocks.push({name:TEAM_NAMES[j],start:start,end:end});
-}
-return blocks;
+  var headerRows=[];
+  for(var i=0;i<rows.length;i++){
+    if(cell(rows[i],1).toLowerCase()==="member type") headerRows.push(i);
+  }
+  var blocks=[];
+  for(var j=0;j<headerRows.length&&j<TEAM_NAMES.length;j++){
+    var start=headerRows[j]+1;
+    var end;
+    if(j+1<headerRows.length){
+      end=headerRows[j+1]-2;
+    }else{
+      end=rows.length-1;
+      for(var k=start;k<rows.length;k++){
+        if(cell(rows[k],0).toLowerCase()==="\u043f\u043b\u0430\u043d"){end=k-1;break;}
+      }
+    }
+    blocks.push({name:TEAM_NAMES[j],start:start,end:end});
+  }
+  return blocks;
 }
 
 function parseTeamBlock(rows,start,end){
-var result={total:0,fact:0,statuses:{}};
-VALID_STATUSES.forEach(function(s){result.statuses[s]=0});
-for(var i=start;i<=end&&i<rows.length;i++){
-var name=cell(rows[i],2);
-var status=cell(rows[i],3);
-if(!name)continue;
-var matched=matchStatus(status);
-if(!matched)continue;
-result.total++;
-result.statuses[matched]++;
-if(FACT_STATUSES.indexOf(matched)>=0)result.fact++;
-}
-return result;
+  var r={total:0,fact:0,statuses:{}};
+  VALID_STATUSES.forEach(function(s){r.statuses[s]=0});
+  for(var i=start;i<=end&&i<rows.length;i++){
+    var name=cell(rows[i],2);
+    var status=cell(rows[i],3);
+    if(!name)continue;
+    var m=matchStatus(status);
+    if(!m)continue;
+    r.total++;
+    r.statuses[m]++;
+    if(FACT_STATUSES.indexOf(m)>=0)r.fact++;
+  }
+  return r;
 }
 
-function findPlan(rows){
-for(var i=0;i<rows.length;i++){
-var a=cell(rows[i],0).toLowerCase();
-if(a==="\u043f\u043b\u0430\u043d"){
-for(var col=1;col<=5;col++){
-var val=parseInt(cell(rows[i],col).replace(/[^0-9]/g,""));
-if(val>0)return val;
-}
-}
-}
-return 0;
+function findTotalPlan(rows){
+  for(var i=0;i<rows.length;i++){
+    if(cell(rows[i],0).toLowerCase()==="\u043f\u043b\u0430\u043d"){
+      for(var c=1;c<=5;c++){
+        var v=parseInt(cell(rows[i],c).replace(/[^0-9]/g,""));
+        if(v>0)return v;
+      }
+    }
+  }
+  return 0;
 }
 
 function fetchData(){
-var url="https://sheets.googleapis.com/v4/spreadsheets/"+SPREADSHEET_ID+"/values/Employee%20list!A1:G250?key="+API_KEY;
-fetch(url).then(function(res){
-if(!res.ok)return res.json().then(function(e){throw new Error(e&&e.error?e.error.message:"HTTP "+res.status)});
-return res.json();
-}).then(function(json){
-var rows=json.values||[];
-var padded=[];
-for(var i=0;i<250;i++){
-if(i<rows.length){
-var r=rows[i].slice();
-while(r.length<7)r.push("");
-padded.push(r);
-}else{
-padded.push(["","","","","","",""]);
-}
-}
-cachedData=padded;
-lastUpdate=new Date();
-render();
-}).catch(function(e){
-document.getElementById("app").innerHTML='<div class="error-box"><div style="font-size:18px;margin-bottom:8px">&#10060; Ошибка загрузки</div><div style="color:#f88">'+esc(e.message)+'</div><button class="btn" onclick="fetchData()" style="margin-top:12px">Попробовать снова</button></div>';
-});
+  var url="https://sheets.googleapis.com/v4/spreadsheets/"+SPREADSHEET_ID+"/values/Employee%20list!A1:G250?key="+API_KEY;
+  fetch(url).then(function(res){
+    if(!res.ok)return res.json().then(function(e){throw new Error(e&&e.error?e.error.message:"HTTP "+res.status)});
+    return res.json();
+  }).then(function(json){
+    var rows=json.values||[];
+    var padded=[];
+    for(var i=0;i<250;i++){
+      if(i<rows.length){var r=rows[i].slice();while(r.length<7)r.push("");padded.push(r);}
+      else padded.push(["","","","","","",""]);
+    }
+    cachedData=padded;
+    lastUpdate=new Date();
+    render();
+  }).catch(function(e){
+    document.getElementById("app").innerHTML='<div class="error-box"><div style="font-size:18px;margin-bottom:8px">&#10060; Ошибка</div><div style="color:#f88">'+esc(e.message)+'</div><button class="btn" onclick="fetchData()" style="margin-top:12px">Попробовать снова</button></div>';
+  });
 }
 
-function getPfColor(pct){if(pct>=90)return "#34a853";if(pct>=70)return "#fbbc04";return "#ea4335";}
+function getPfColor(p){if(p>=90)return"#34a853";if(p>=70)return"#fbbc04";return"#ea4335";}
 
 function render(){
-if(!cachedData){fetchData();return}
-var rows=cachedData;
-var blocks=findTeamBlocks(rows);
-var teamData=[];
-var grandTotal=0;
-var grandFact=0;
-var grandStatuses={};
-VALID_STATUSES.forEach(function(s){grandStatuses[s]=0});
+  if(!cachedData){fetchData();return}
+  var rows=cachedData;
+  var blocks=findTeamBlocks(rows);
+  var td=[];
+  var gT=0,gF=0,gS={};
+  VALID_STATUSES.forEach(function(s){gS[s]=0});
+  blocks.forEach(function(b){
+    var p=parseTeamBlock(rows,b.start,b.end);
+    td.push({name:b.name,total:p.total,fact:p.fact,statuses:p.statuses});
+    gT+=p.total;gF+=p.fact;
+    VALID_STATUSES.forEach(function(s){gS[s]+=p.statuses[s]});
+  });
+  var tPlan=findTotalPlan(rows);
+  var h="";
 
-blocks.forEach(function(b){
-var parsed=parseTeamBlock(rows,b.start,b.end);
-teamData.push({name:b.name,total:parsed.total,fact:parsed.fact,statuses:parsed.statuses});
-grandTotal+=parsed.total;
-grandFact+=parsed.fact;
-VALID_STATUSES.forEach(function(s){grandStatuses[s]+=parsed.statuses[s]});
-});
+  h+='<div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:8px;margin-bottom:20px">';
+  h+='<div><h1>&#128202; TCM Dashboard v2</h1><div class="subtitle">4 команды · Данные в реальном времени</div></div>';
+  h+='<div style="display:flex;align-items:center;gap:8px">';
+  if(lastUpdate){h+='<div class="status-dot"></div><span class="status-text">'+lastUpdate.toLocaleTimeString("ru-RU")+'</span>';}
+  h+='<button class="btn" onclick="fetchData()">&#128260; Обновить</button></div></div>';
 
-var totalPlan=findPlan(rows);
-var h="";
+  /* PLAN-FACT */
+  h+='<div class="section"><div class="section-title">&#128203; Выполнение плана найма</div>';
+  var tPct=tPlan>0?Math.round(gF/tPlan*100):0;
+  var tCol=getPfColor(tPct);
+  h+='<div class="pf-total-card"><div class="pf-total-nums"><div><span class="pf-total-big" style="color:'+tCol+'">'+gF+'</span><span style="color:#666;font-size:18px"> / '+tPlan+'</span></div>';
+  h+='<div class="pf-pct" style="color:'+tCol+'">'+tPct+'%</div></div>';
+  h+='<div style="font-size:13px;color:#888;margin-bottom:8px">Общий факт / план</div>';
+  h+='<div class="pf-bar-bg"><div class="pf-bar-fill" style="width:'+Math.min(tPct,100)+'%;background:'+tCol+'"></div></div></div>';
+  h+='<div class="grid4">';
+  td.forEach(function(t){
+    var p=TEAM_PLAN>0?Math.round(t.fact/TEAM_PLAN*100):0;
+    var c=getPfColor(p);
+    h+='<div class="pf-card"><div class="pf-name">'+esc(t.name)+'</div>';
+    h+='<div class="pf-nums"><span class="pf-fact" style="color:'+c+'">'+t.fact+'</span><span class="pf-plan">/ '+TEAM_PLAN+'</span></div>';
+    h+='<div style="font-size:20px;font-weight:700;color:'+c+'">'+p+'%</div>';
+    h+='<div class="pf-bar-bg"><div class="pf-bar-fill" style="width:'+Math.min(p,100)+'%;background:'+c+'"></div></div></div>';
+  });
+  h+='</div></div>';
 
-h+='<div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:8px;margin-bottom:20px">';
-h+='<div><h1>&#128202; TCM Dashboard</h1><div class="subtitle">Команды TCM · Данные в реальном времени</div></div>';
-h+='<div style="display:flex;align-items:center;gap:8px">';
-if(lastUpdate){h+='<div class="status-dot"></div>';h+='<span class="status-text">Обновлено: '+lastUpdate.toLocaleTimeString("ru-RU")+'</span>';}
-h+='<button class="btn" onclick="fetchData()">&#128260; Обновить</button>';
-h+='</div></div>';
+  /* EMPLOYEES */
+  h+='<div class="section"><div class="total-number">'+gT+'</div>';
+  h+='<div class="total-label">Всего сотрудников TCM</div>';
+  h+='<div class="total-statuses">';
+  VALID_STATUSES.forEach(function(s){h+='<div class="total-stat"><div class="num" style="color:'+STATUS_COLORS[s]+'">'+gS[s]+'</div><div class="lbl">'+s+'</div></div>';});
+  h+='</div>';
+  if(gT>0){h+='<div class="progress-wrap"><div class="progress-bar">';
+  VALID_STATUSES.forEach(function(s){var p=gS[s]/gT*100;if(p>0)h+='<div class="progress-seg" style="width:'+p+'%;background:'+STATUS_COLORS[s]+'"></div>';});
+  h+='</div></div>';}
+  h+='</div>';
 
-h+='<div class="section">';
-h+='<div class="section-title">&#128203; Выполнение плана найма</div>';
-var totalFactPct=totalPlan>0?Math.round(grandFact/totalPlan*100):0;
-var totalPfCol=getPfColor(totalFactPct);
-h+='<div class="pf-total-card">';
-h+='<div class="pf-total-nums"><div><span class="pf-total-big" style="color:'+totalPfCol+'">'+grandFact+'</span><span style="color:#666;font-size:18px"> / '+totalPlan+'</span></div>';
-h+='<div class="pf-pct" style="color:'+totalPfCol+'">'+totalFactPct+'%</div></div>';
-h+='<div style="font-size:13px;color:#888;margin-bottom:8px">Общий факт / план</div>';
-h+='<div class="pf-bar-bg"><div class="pf-bar-fill" style="width:'+Math.min(totalFactPct,100)+'%;background:'+totalPfCol+'"></div></div>';
-h+='</div>';
-h+='<div class="grid4">';
-teamData.forEach(function(team){
-var pct=TEAM_PLAN>0?Math.round(team.fact/TEAM_PLAN*100):0;
-var col=getPfColor(pct);
-h+='<div class="pf-card"><div class="pf-name">'+esc(team.name)+'</div>';
-h+='<div class="pf-nums"><span class="pf-fact" style="color:'+col+'">'+team.fact+'</span><span class="pf-plan">/ '+TEAM_PLAN+'</span></div>';
-h+='<div style="font-size:20px;font-weight:700;color:'+col+'">'+pct+'%</div>';
-h+='<div class="pf-bar-bg"><div class="pf-bar-fill" style="width:'+Math.min(pct,100)+'%;background:'+col+'"></div></div></div>';
-});
-h+='</div></div>';
+  /* TEAM CARDS */
+  h+='<div class="grid4">';
+  td.forEach(function(t){
+    h+='<div class="card"><div class="team-name">'+esc(t.name)+'</div>';
+    h+='<div class="team-total">'+t.total+'</div><div class="team-total-label">сотрудников</div>';
+    VALID_STATUSES.forEach(function(s){if(t.statuses[s]>0){
+      h+='<div class="status-row"><div class="status-name"><div class="status-badge" style="background:'+STATUS_COLORS[s]+'"></div>'+s+'</div>';
+      h+='<div class="status-count" style="color:'+STATUS_COLORS[s]+'">'+t.statuses[s]+'</div></div>';
+    }});
+    if(t.total>0){h+='<div class="progress-wrap"><div class="progress-bar">';
+    VALID_STATUSES.forEach(function(s){var p=t.statuses[s]/t.total*100;if(p>0)h+='<div class="progress-seg" style="width:'+p+'%;background:'+STATUS_COLORS[s]+'"></div>';});
+    h+='</div></div>';}
+    h+='</div>';
+  });
+  h+='</div>';
 
-h+='<div class="section">';
-h+='<div class="total-number">'+grandTotal+'</div>';
-h+='<div class="total-label">Всего сотрудников TCM</div>';
-h+='<div class="total-statuses">';
-VALID_STATUSES.forEach(function(s){h+='<div class="total-stat"><div class="num" style="color:'+STATUS_COLORS[s]+'">'+grandStatuses[s]+'</div><div class="lbl">'+s+'</div></div>';});
-h+='</div>';
-if(grandTotal>0){h+='<div class="progress-wrap"><div class="progress-bar">';
-VALID_STATUSES.forEach(function(s){var pct=grandStatuses[s]/grandTotal*100;if(pct>0)h+='<div class="progress-seg" style="width:'+pct+'%;background:'+STATUS_COLORS[s]+'"></div>';});
-h+='</div></div>';}
-h+='</div>';
+  h+='<div class="legend">';
+  VALID_STATUSES.forEach(function(s){h+='<div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#888"><div style="width:10px;height:10px;border-radius:3px;background:'+STATUS_COLORS[s]+'"></div>'+s+'</div>';});
+  h+='</div>';
 
-h+='<div class="grid4">';
-teamData.forEach(function(team){
-h+='<div class="card"><div class="team-name">'+esc(team.name)+'</div>';
-h+='<div class="team-total">'+team.total+'</div><div class="team-total-label">сотрудников</div>';
-VALID_STATUSES.forEach(function(s){if(team.statuses[s]>0){h+='<div class="status-row"><div class="status-name"><div class="status-badge" style="background:'+STATUS_COLORS[s]+'"></div>'+s+'</div><div class="status-count" style="color:'+STATUS_COLORS[s]+'">'+team.statuses[s]+'</div></div>';}});
-if(team.total>0){h+='<div class="progress-wrap"><div class="progress-bar">';
-VALID_STATUSES.forEach(function(s){var pct=team.statuses[s]/team.total*100;if(pct>0)h+='<div class="progress-seg" style="width:'+pct+'%;background:'+STATUS_COLORS[s]+'"></div>';});
-h+='</div></div>';}
-h+='</div>';
-});
-h+='</div>';
-
-h+='<div class="legend">';
-VALID_STATUSES.forEach(function(s){h+='<div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#888"><div style="width:10px;height:10px;border-radius:3px;background:'+STATUS_COLORS[s]+'"></div>'+s+'</div>';});
-h+='</div>';
-
-document.getElementById("app").innerHTML=h;
+  document.getElementById("app").innerHTML=h;
 }
 </script>
 </body>

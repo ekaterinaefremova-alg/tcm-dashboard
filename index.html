@@ -168,4 +168,97 @@ if(!raw)continue;var m=mst(raw);if(!m||m==="Exiting"||ST.indexOf(m)<0)continue;
 dcTots[m]++;
 if(!ld)continue;
 var k=ld.charAt(0).toUpperCase()+ld.slice(1).toLowerCase();
-if(!dcTeams[k]){d
+if(!dcTeams[k]){dcTeams[k]={};ST.forEach(function(x){dcTeams[k][x]=0});}
+dcTeams[k][m]++;
+}
+
+var lu=new Date();
+var h="";
+
+// header
+h+='<div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:8px;margin-bottom:20px">';
+h+='<div><h1>&#128202; TCM Dashboard v5</h1><div class="sub">4 команды · Обновление каждые 60 сек</div></div>';
+h+='<div style="display:flex;align-items:center;gap:8px"><div class="dot"></div><span class="stx">'+lu.toLocaleTimeString("ru-RU")+'</span>';
+h+='<button class="btn" onclick="loadAll()">&#128260; Обновить</button></div></div>';
+
+// plan-fact
+h+='<div class="sec"><div class="sec-t">&#128203; Выполнение плана найма</div>';
+var tp=tP>0?Math.round(gF/tP*100):0,tc=pfc(tp);
+h+='<div class="ptc"><div class="ptn"><div><span class="ptb" style="color:'+tc+'">'+gF+'</span><span style="color:#666;font-size:18px"> / '+tP+'</span></div>';
+h+='<div class="ptp" style="color:'+tc+'">'+tp+'%</div></div>';
+h+='<div style="font-size:13px;color:#888;margin-bottom:8px">Общий факт / план</div>';
+h+='<div class="pbg"><div class="pfl" style="width:'+Math.min(tp,100)+'%;background:'+tc+'"></div></div></div>';
+h+='<div class="g4">';
+td.forEach(function(t){var p=TEAM_PLAN>0?Math.round(t.f/TEAM_PLAN*100):0,c2=pfc(p);
+h+='<div class="pc"><div class="pn">'+esc(t.nm)+'</div><div class="pnm"><span class="pf" style="color:'+c2+'">'+t.f+'</span><span class="pp">/ '+TEAM_PLAN+'</span></div>';
+h+='<div style="font-size:20px;font-weight:700;color:'+c2+'">'+p+'%</div>';
+h+='<div class="pbg"><div class="pfl" style="width:'+Math.min(p,100)+'%;background:'+c2+'"></div></div></div>';
+});
+h+='</div></div>';
+
+// employees total
+h+='<div class="sec"><div class="big">'+gT+'</div><div class="big-l">Всего сотрудников TCM</div>';
+h+='<div class="stats">';
+ST.forEach(function(x){h+='<div class="stat"><div class="n" style="color:'+COL[x]+'">'+gS[x]+'</div><div class="l">'+x+'</div></div>';});
+h+='</div>';
+if(gT>0){h+='<div class="pw"><div class="pb">';ST.forEach(function(x){var p=gS[x]/gT*100;if(p>0)h+='<div class="ps" style="width:'+p+'%;background:'+COL[x]+'"></div>';});h+='</div></div>';}
+h+='</div>';
+
+// team cards
+h+='<div class="g4">';
+td.forEach(function(t){
+h+='<div class="cd"><div class="tn">'+esc(t.nm)+'</div><div class="tt">'+t.t+'</div><div class="tl">сотрудников</div>';
+ST.forEach(function(x){if(t.st[x]>0){h+='<div class="sr"><div class="sn"><div class="sb" style="background:'+COL[x]+'"></div>'+x+'</div><div class="sc" style="color:'+COL[x]+'">'+t.st[x]+'</div></div>';}});
+if(t.t>0){h+='<div class="pw"><div class="pb">';ST.forEach(function(x){var p=t.st[x]/t.t*100;if(p>0)h+='<div class="ps" style="width:'+p+'%;background:'+COL[x]+'"></div>';});h+='</div></div>';}
+h+='</div>';
+});
+h+='</div>';
+
+// legend
+h+='<div class="lg">';
+ST.forEach(function(x){h+='<div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#888"><div style="width:10px;height:10px;border-radius:3px;background:'+COL[x]+'"></div>'+x+'</div>';});
+h+='</div>';
+
+// DOUBLE CHECK
+h+='<div class="sec">';
+h+='<div class="sec-t">&#128269; Дабл чек (лист Team)</div>';
+
+if(tmErr){
+h+='<div style="color:#ea4335;font-size:14px;padding:12px;background:#1a1d27;border-radius:8px">Ошибка: '+esc(tmErr)+'</div>';
+}else if(tmRows.length<2){
+h+='<div style="color:#888;font-size:14px">Нет данных на листе Team</div>';
+}else{
+h+='<div style="font-size:13px;color:#666;margin-bottom:16px">Сверка с вкладкой Team</div>';
+h+='<div style="overflow-x:auto"><table class="dct"><tr><th>Команда</th>';
+ST.forEach(function(x){h+='<th style="text-align:center;color:'+COL[x]+'">'+x+'</th>';});
+h+='<th style="text-align:center">Всего</th></tr>';
+
+var dcG=0,dcGS={};ST.forEach(function(x){dcGS[x]=0});
+TEAM_NAMES.forEach(function(tn){
+var tm=null;for(var k in dcTeams){if(k.toLowerCase()===tn.toLowerCase()){tm=dcTeams[k];break;}}
+if(!tm){tm={};ST.forEach(function(x){tm[x]=0});}
+var rt=0;ST.forEach(function(x){var v=tm[x]||0;rt+=v;dcGS[x]+=v;});dcG+=rt;
+h+='<tr><td style="font-weight:600">'+esc(tn)+'</td>';
+ST.forEach(function(x){var v=tm[x]||0;h+='<td class="nm" style="color:'+(v>0?COL[x]:"#444")+'">'+v+'</td>';});
+h+='<td class="nm" style="color:#fff">'+rt+'</td></tr>';
+});
+h+='<tr class="dct-tot"><td>Итого</td>';
+ST.forEach(function(x){h+='<td class="nm" style="color:'+COL[x]+'">'+dcGS[x]+'</td>';});
+h+='<td class="nm" style="color:#fff">'+dcG+'</td></tr></table></div>';
+
+var match=gT===dcG;
+h+='<div style="margin-top:16px;padding:14px 20px;border-radius:12px;background:#0f1117;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">';
+h+='<div style="font-size:14px;color:#888">Employee list: <span style="color:#fff;font-weight:700">'+gT+'</span> &#8596; Team: <span style="color:#fff;font-weight:700">'+dcG+'</span></div>';
+if(match){h+='<div style="color:#34a853;font-weight:700;font-size:14px">&#9989; Совпадает</div>';}
+else{var df=gT-dcG;h+='<div style="color:#ea4335;font-weight:700;font-size:14px">&#9888; Расхождение: '+(df>0?"+":"")+df+'</div>';}
+h+='</div>';
+}
+h+='</div>';
+
+document.getElementById("app").innerHTML=h;
+}
+</script>
+</body>
+</html>
+
+Заливайте на GitHub → инкогнито (Cmd+Shift+N). Если видите "v5" но нет дабл чека — скриншот всей страниц

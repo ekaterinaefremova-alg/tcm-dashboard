@@ -8,268 +8,185 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:system-ui,-apple-system,sans-serif;background:#0f1117;color:#e0e0e0;padding:20px;min-height:100vh}
 h1{font-size:24px;font-weight:700;margin-bottom:4px;color:#fff}
-.subtitle{font-size:13px;color:#666;margin-bottom:24px}
+.sub{font-size:13px;color:#666;margin-bottom:24px}
 .btn{padding:6px 14px;font-size:12px;border-radius:8px;border:1px solid #333;background:#1a1d27;color:#ccc;cursor:pointer}
 .btn:hover{background:#252833}
-.status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#34a853}
-.status-text{font-size:12px;color:#888}
-.section{background:linear-gradient(135deg,#1a1d27,#252833);border-radius:16px;padding:24px;margin-bottom:24px;border:1px solid #2a2d3a}
-.section-title{font-size:18px;font-weight:700;color:#fff;margin-bottom:16px}
-.total-number{font-size:56px;font-weight:800;color:#fff;line-height:1}
-.total-label{font-size:14px;color:#888;margin-top:4px;margin-bottom:16px}
-.total-statuses{display:flex;gap:16px;flex-wrap:wrap}
-.total-stat{background:#1a1d27;border-radius:12px;padding:12px 20px;border:1px solid #2a2d3a;min-width:120px}
-.total-stat .num{font-size:24px;font-weight:700}
-.total-stat .lbl{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px}
-.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:16px}
-.card{background:#1a1d27;border-radius:16px;padding:20px;border:1px solid #2a2d3a;transition:transform 0.2s}
-.card:hover{transform:translateY(-2px)}
-.team-name{font-size:16px;font-weight:700;color:#fff;margin-bottom:4px}
-.team-total{font-size:36px;font-weight:800;color:#fff;margin-bottom:12px}
-.team-total-label{font-size:11px;color:#666;margin-bottom:12px}
-.status-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #1f2230}
-.status-row:last-child{border:none}
-.status-name{font-size:13px;display:flex;align-items:center;gap:8px}
-.status-badge{width:10px;height:10px;border-radius:3px}
-.status-count{font-size:16px;font-weight:700}
-.progress-wrap{margin-top:12px}
-.progress-bar{height:8px;border-radius:4px;background:#0f1117;overflow:hidden;display:flex}
-.progress-seg{height:100%;transition:width 0.5s}
-.loading{text-align:center;padding:80px 20px}
-.spinner{font-size:36px;animation:pulse 1s infinite}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#34a853}
+.st{font-size:12px;color:#888}
+.sec{background:linear-gradient(135deg,#1a1d27,#252833);border-radius:16px;padding:24px;margin-bottom:24px;border:1px solid #2a2d3a}
+.sec-t{font-size:18px;font-weight:700;color:#fff;margin-bottom:16px}
+.big{font-size:56px;font-weight:800;color:#fff;line-height:1}
+.big-l{font-size:14px;color:#888;margin-top:4px;margin-bottom:16px}
+.stats{display:flex;gap:16px;flex-wrap:wrap}
+.stat{background:#1a1d27;border-radius:12px;padding:12px 20px;border:1px solid #2a2d3a;min-width:120px}
+.stat .n{font-size:24px;font-weight:700}
+.stat .l{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:16px}
+.cd{background:#1a1d27;border-radius:16px;padding:20px;border:1px solid #2a2d3a;transition:transform .2s}
+.cd:hover{transform:translateY(-2px)}
+.tn{font-size:16px;font-weight:700;color:#fff;margin-bottom:4px}
+.tt{font-size:36px;font-weight:800;color:#fff;margin-bottom:12px}
+.tl{font-size:11px;color:#666;margin-bottom:12px}
+.sr{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #1f2230}
+.sr:last-child{border:none}
+.sn{font-size:13px;display:flex;align-items:center;gap:8px}
+.sb{width:10px;height:10px;border-radius:3px}
+.sc{font-size:16px;font-weight:700}
+.pw{margin-top:12px}
+.pb{height:8px;border-radius:4px;background:#0f1117;overflow:hidden;display:flex}
+.ps{height:100%;transition:width .5s}
+.ld{text-align:center;padding:80px 20px}
+.sp{font-size:36px;animation:pulse 1s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.error-box{background:#2a1515;border:1px solid #5a2020;border-radius:12px;padding:20px;margin:20px 0}
-@media(max-width:900px){.grid4{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:700px){.grid4{grid-template-columns:1fr}}
-.login-wrap{display:flex;justify-content:center;align-items:center;min-height:80vh}
-.login-box{background:#1a1d27;border:1px solid #2a2d3a;border-radius:16px;padding:40px;width:100%;max-width:380px;text-align:center}
-.login-box h2{font-size:20px;color:#fff;margin-bottom:8px}
-.login-box p{font-size:13px;color:#666;margin-bottom:24px}
-.login-input{width:100%;padding:12px 16px;border-radius:10px;border:1px solid #333;background:#0f1117;color:#fff;font-size:14px;outline:none;margin-bottom:12px}
-.login-input:focus{border-color:#4285f4}
-.login-btn{width:100%;padding:12px;border-radius:10px;border:none;background:#4285f4;color:#fff;font-size:14px;font-weight:600;cursor:pointer}
-.login-btn:hover{background:#3275e4}
-.login-error{color:#ea4335;font-size:13px;margin-top:8px;display:none}
-.legend{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:24px}
-.pf-card{background:#0f1117;border-radius:14px;padding:20px;text-align:center}
-.pf-name{font-size:14px;font-weight:600;color:#fff;margin-bottom:12px}
-.pf-nums{display:flex;justify-content:center;align-items:baseline;gap:6px;margin-bottom:8px}
-.pf-fact{font-size:36px;font-weight:800}
-.pf-plan{font-size:18px;color:#666}
-.pf-bar-bg{height:10px;border-radius:5px;background:#1f2230;overflow:hidden;margin-top:10px}
-.pf-bar-fill{height:100%;border-radius:5px;transition:width 0.6s}
-.pf-total-card{background:#0f1117;border-radius:14px;padding:20px;margin-bottom:16px}
-.pf-total-nums{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.pf-total-big{font-size:32px;font-weight:800}
-.pf-pct{font-size:28px;font-weight:800}
+.eb{background:#2a1515;border:1px solid #5a2020;border-radius:12px;padding:20px;margin:20px 0}
+@media(max-width:900px){.g4{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.g4{grid-template-columns:1fr}}
+.lw{display:flex;justify-content:center;align-items:center;min-height:80vh}
+.lb{background:#1a1d27;border:1px solid #2a2d3a;border-radius:16px;padding:40px;width:100%;max-width:380px;text-align:center}
+.lb h2{font-size:20px;color:#fff;margin-bottom:8px}
+.lb p{font-size:13px;color:#666;margin-bottom:24px}
+.li{width:100%;padding:12px 16px;border-radius:10px;border:1px solid #333;background:#0f1117;color:#fff;font-size:14px;outline:none;margin-bottom:12px}
+.li:focus{border-color:#4285f4}
+.lbn{width:100%;padding:12px;border-radius:10px;border:none;background:#4285f4;color:#fff;font-size:14px;font-weight:600;cursor:pointer}
+.lbn:hover{background:#3275e4}
+.le{color:#ea4335;font-size:13px;margin-top:8px;display:none}
+.lg{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:24px}
+.pc{background:#0f1117;border-radius:14px;padding:20px;text-align:center}
+.pn{font-size:14px;font-weight:600;color:#fff;margin-bottom:12px}
+.pnm{display:flex;justify-content:center;align-items:baseline;gap:6px;margin-bottom:8px}
+.pf{font-size:36px;font-weight:800}
+.pp{font-size:18px;color:#666}
+.pbg{height:10px;border-radius:5px;background:#1f2230;overflow:hidden;margin-top:10px}
+.pfl{height:100%;border-radius:5px;transition:width .6s}
+.ptc{background:#0f1117;border-radius:14px;padding:20px;margin-bottom:16px}
+.ptn{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.ptb{font-size:32px;font-weight:800}
+.ptp{font-size:28px;font-weight:800}
 </style>
 </head>
 <body>
-<div id="login">
-<div class="login-wrap">
-<div class="login-box">
+<div id="login"><div class="lw"><div class="lb">
 <h2>&#128274; TCM Dashboard</h2>
 <p>Введите пароль для доступа</p>
-<input type="password" class="login-input" id="passInput" placeholder="Пароль" onkeydown="if(event.key==='Enter')checkPass()">
-<button class="login-btn" onclick="checkPass()">Войти</button>
-<div class="login-error" id="loginError">Неверный пароль</div>
-</div>
-</div>
-</div>
-<div id="app" style="display:none">
-<div class="loading"><div class="spinner">&#9203;</div>
-<div style="font-size:18px;font-weight:600;color:#888;margin-top:12px">Загрузка данных...</div></div>
-</div>
+<input type="password" class="li" id="pi" placeholder="Пароль" onkeydown="if(event.key==='Enter')go()">
+<button class="lbn" onclick="go()">Войти</button>
+<div class="le" id="er">Неверный пароль</div>
+</div></div></div>
+<div id="app" style="display:none"><div class="ld"><div class="sp">&#9203;</div>
+<div style="font-size:18px;font-weight:600;color:#888;margin-top:12px">Загрузка...</div></div></div>
 <script>
-/* === CONFIG === */
-var PASS="tcmlatam2026";
-var API_KEY="AIzaSyCnzz6tG4bJCCyRuQ5oTddeDEpDg-PShko";
-var SPREADSHEET_ID="1gp8zaHuu_ctZeJnSpehLDaoYpDzzY5MvvmPdp9sp3Mk";
-var TEAM_NAMES=["Florencia","Misael","Belen","Jesus"];
-var TEAM_PLAN=14;
-var VALID_STATUSES=["Working","Test Period","Probation","On-boarding"];
-var FACT_STATUSES=["Working","Test Period"];
-var STATUS_COLORS={"Working":"#34a853","Test Period":"#b39ddb","Probation":"#fbbc04","On-boarding":"#4fc3f7"};
-/* === END CONFIG === */
+var P="tcmlatam2026";
+var K="AIzaSyCnzz6tG4bJCCyRuQ5oTddeDEpDg-PShko";
+var S="1gp8zaHuu_ctZeJnSpehLDaoYpDzzY5MvvmPdp9sp3Mk";
+var TN=["Florencia","Misael","Belen","Jesus"];
+var TP=14;
+var VS=["Working","Test Period","Probation","On-boarding"];
+var FS=["Working","Test Period"];
+var SC={"Working":"#34a853","Test Period":"#b39ddb","Probation":"#fbbc04","On-boarding":"#4fc3f7"};
+var lu=null,cd=null;
 
-var lastUpdate=null;
-var cachedData=null;
+function go(){
+var i=document.getElementById("pi").value;
+if(i===P){document.getElementById("login").style.display="none";document.getElementById("app").style.display="block";fd();setInterval(fd,60000);}
+else{document.getElementById("er").style.display="block";document.getElementById("pi").value="";}
+}
+function e(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+function c(r,i){if(!r||i>=r.length)return"";return String(r[i]||"").trim()}
+function ms(s){var l=s.toLowerCase();if(l.indexOf("exit")>=0)return"";if(l.indexOf("work")>=0)return"Working";if(l.indexOf("test")>=0)return"Test Period";if(l.indexOf("prob")>=0)return"Probation";if(l.indexOf("on")>=0&&l.indexOf("bo")>=0)return"On-boarding";return"";}
+function gc(p){if(p>=90)return"#34a853";if(p>=70)return"#fbbc04";return"#ea4335";}
 
-function checkPass(){
-  var input=document.getElementById("passInput").value;
-  if(input===PASS){
-    document.getElementById("login").style.display="none";
-    document.getElementById("app").style.display="block";
-    fetchData();
-    setInterval(fetchData,60000);
-  }else{
-    document.getElementById("loginError").style.display="block";
-    document.getElementById("passInput").value="";
-  }
+function fb(rows){
+var hr=[];
+for(var i=0;i<rows.length;i++){if(c(rows[i],1).toLowerCase()==="member type")hr.push(i);}
+var bl=[];
+for(var j=0;j<hr.length&&j<TN.length;j++){
+var s=hr[j]+1,en;
+if(j+1<hr.length){en=hr[j+1]-2;}
+else{en=rows.length-1;for(var k=s;k<rows.length;k++){if(c(rows[k],0).toLowerCase()==="\u043f\u043b\u0430\u043d"){en=k-1;break;}}}
+bl.push({nm:TN[j],s:s,e:en});
+}
+return bl;
 }
 
-function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
-
-function cell(row,col){
-  if(!row||col>=row.length)return "";
-  return String(row[col]||"").trim();
+function pt(rows,s,en){
+var r={t:0,f:0,st:{}};VS.forEach(function(x){r.st[x]=0});
+for(var i=s;i<=en&&i<rows.length;i++){
+var nm=c(rows[i],2),ss=c(rows[i],3);
+if(!nm)continue;var m=ms(ss);if(!m)continue;
+r.t++;r.st[m]++;if(FS.indexOf(m)>=0)r.f++;
+}
+return r;
 }
 
-function matchStatus(status){
-  var s=status.toLowerCase();
-  if(s.indexOf("exit")>=0)return "";
-  if(s.indexOf("work")>=0)return "Working";
-  if(s.indexOf("test")>=0)return "Test Period";
-  if(s.indexOf("prob")>=0)return "Probation";
-  if(s.indexOf("on")>=0&&s.indexOf("bo")>=0)return "On-boarding";
-  return "";
+function fp(rows){
+for(var i=0;i<rows.length;i++){
+if(c(rows[i],0).toLowerCase()==="\u043f\u043b\u0430\u043d"){
+for(var j=1;j<=5;j++){var v=parseInt(c(rows[i],j).replace(/[^0-9]/g,""));if(v>0)return v;}
+}
+}
+return 0;
 }
 
-function findTeamBlocks(rows){
-  var headerRows=[];
-  for(var i=0;i<rows.length;i++){
-    if(cell(rows[i],1).toLowerCase()==="member type") headerRows.push(i);
-  }
-  var blocks=[];
-  for(var j=0;j<headerRows.length&&j<TEAM_NAMES.length;j++){
-    var start=headerRows[j]+1;
-    var end;
-    if(j+1<headerRows.length){
-      end=headerRows[j+1]-2;
-    }else{
-      end=rows.length-1;
-      for(var k=start;k<rows.length;k++){
-        if(cell(rows[k],0).toLowerCase()==="\u043f\u043b\u0430\u043d"){end=k-1;break;}
-      }
-    }
-    blocks.push({name:TEAM_NAMES[j],start:start,end:end});
-  }
-  return blocks;
+function fd(){
+var u="https://sheets.googleapis.com/v4/spreadsheets/"+S+"/values/Employee%20list!A1:G250?key="+K;
+fetch(u).then(function(r){if(!r.ok)return r.json().then(function(x){throw new Error(x&&x.error?x.error.message:"HTTP "+r.status)});return r.json();}).then(function(j){
+var rows=j.values||[],pd=[];
+for(var i=0;i<250;i++){if(i<rows.length){var r=rows[i].slice();while(r.length<7)r.push("");pd.push(r);}else pd.push(["","","","","","",""]);}
+cd=pd;lu=new Date();rn();
+}).catch(function(x){document.getElementById("app").innerHTML='<div class="eb"><div style="font-size:18px;margin-bottom:8px">&#10060; Ошибка</div><div style="color:#f88">'+e(x.message)+'</div><button class="btn" onclick="fd()" style="margin-top:12px">Попробовать снова</button></div>';});
 }
 
-function parseTeamBlock(rows,start,end){
-  var r={total:0,fact:0,statuses:{}};
-  VALID_STATUSES.forEach(function(s){r.statuses[s]=0});
-  for(var i=start;i<=end&&i<rows.length;i++){
-    var name=cell(rows[i],2);
-    var status=cell(rows[i],3);
-    if(!name)continue;
-    var m=matchStatus(status);
-    if(!m)continue;
-    r.total++;
-    r.statuses[m]++;
-    if(FACT_STATUSES.indexOf(m)>=0)r.fact++;
-  }
-  return r;
-}
+function rn(){
+if(!cd){fd();return}
+var rows=cd,bl=fb(rows),td=[],gT=0,gF=0,gS={};
+VS.forEach(function(x){gS[x]=0});
+bl.forEach(function(b){var p=pt(rows,b.s,b.e);td.push({nm:b.nm,t:p.t,f:p.f,st:p.st});gT+=p.t;gF+=p.f;VS.forEach(function(x){gS[x]+=p.st[x]});});
+var tP=fp(rows);
+var h="";
 
-function findTotalPlan(rows){
-  for(var i=0;i<rows.length;i++){
-    if(cell(rows[i],0).toLowerCase()==="\u043f\u043b\u0430\u043d"){
-      for(var c=1;c<=5;c++){
-        var v=parseInt(cell(rows[i],c).replace(/[^0-9]/g,""));
-        if(v>0)return v;
-      }
-    }
-  }
-  return 0;
-}
+h+='<div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:8px;margin-bottom:20px">';
+h+='<div><h1>&#128202; TCM Dashboard v3</h1><div class="sub">4 команды · Обновление каждые 60 сек</div></div>';
+h+='<div style="display:flex;align-items:center;gap:8px">';
+if(lu){h+='<div class="dot"></div><span class="st">'+lu.toLocaleTimeString("ru-RU")+'</span>';}
+h+='<button class="btn" onclick="fd()">&#128260; Обновить</button></div></div>';
 
-function fetchData(){
-  var url="https://sheets.googleapis.com/v4/spreadsheets/"+SPREADSHEET_ID+"/values/Employee%20list!A1:G250?key="+API_KEY;
-  fetch(url).then(function(res){
-    if(!res.ok)return res.json().then(function(e){throw new Error(e&&e.error?e.error.message:"HTTP "+res.status)});
-    return res.json();
-  }).then(function(json){
-    var rows=json.values||[];
-    var padded=[];
-    for(var i=0;i<250;i++){
-      if(i<rows.length){var r=rows[i].slice();while(r.length<7)r.push("");padded.push(r);}
-      else padded.push(["","","","","","",""]);
-    }
-    cachedData=padded;
-    lastUpdate=new Date();
-    render();
-  }).catch(function(e){
-    document.getElementById("app").innerHTML='<div class="error-box"><div style="font-size:18px;margin-bottom:8px">&#10060; Ошибка</div><div style="color:#f88">'+esc(e.message)+'</div><button class="btn" onclick="fetchData()" style="margin-top:12px">Попробовать снова</button></div>';
-  });
-}
+h+='<div class="sec"><div class="sec-t">&#128203; Выполнение плана найма</div>';
+var tp=tP>0?Math.round(gF/tP*100):0,tc=gc(tp);
+h+='<div class="ptc"><div class="ptn"><div><span class="ptb" style="color:'+tc+'">'+gF+'</span><span style="color:#666;font-size:18px"> / '+tP+'</span></div>';
+h+='<div class="ptp" style="color:'+tc+'">'+tp+'%</div></div>';
+h+='<div style="font-size:13px;color:#888;margin-bottom:8px">Общий факт / план</div>';
+h+='<div class="pbg"><div class="pfl" style="width:'+Math.min(tp,100)+'%;background:'+tc+'"></div></div></div>';
+h+='<div class="g4">';
+td.forEach(function(t){
+var p=TP>0?Math.round(t.f/TP*100):0,cl=gc(p);
+h+='<div class="pc"><div class="pn">'+e(t.nm)+'</div>';
+h+='<div class="pnm"><span class="pf" style="color:'+cl+'">'+t.f+'</span><span class="pp">/ '+TP+'</span></div>';
+h+='<div style="font-size:20px;font-weight:700;color:'+cl+'">'+p+'%</div>';
+h+='<div class="pbg"><div class="pfl" style="width:'+Math.min(p,100)+'%;background:'+cl+'"></div></div></div>';
+});
+h+='</div></div>';
 
-function getPfColor(p){if(p>=90)return"#34a853";if(p>=70)return"#fbbc04";return"#ea4335";}
+h+='<div class="sec"><div class="big">'+gT+'</div><div class="big-l">Всего сотрудников TCM</div>';
+h+='<div class="stats">';
+VS.forEach(function(x){h+='<div class="stat"><div class="n" style="color:'+SC[x]+'">'+gS[x]+'</div><div class="l">'+x+'</div></div>';});
+h+='</div>';
+if(gT>0){h+='<div class="pw"><div class="pb">';VS.forEach(function(x){var p=gS[x]/gT*100;if(p>0)h+='<div class="ps" style="width:'+p+'%;background:'+SC[x]+'"></div>';});h+='</div></div>';}
+h+='</div>';
 
-function render(){
-  if(!cachedData){fetchData();return}
-  var rows=cachedData;
-  var blocks=findTeamBlocks(rows);
-  var td=[];
-  var gT=0,gF=0,gS={};
-  VALID_STATUSES.forEach(function(s){gS[s]=0});
-  blocks.forEach(function(b){
-    var p=parseTeamBlock(rows,b.start,b.end);
-    td.push({name:b.name,total:p.total,fact:p.fact,statuses:p.statuses});
-    gT+=p.total;gF+=p.fact;
-    VALID_STATUSES.forEach(function(s){gS[s]+=p.statuses[s]});
-  });
-  var tPlan=findTotalPlan(rows);
-  var h="";
+h+='<div class="g4">';
+td.forEach(function(t){
+h+='<div class="cd"><div class="tn">'+e(t.nm)+'</div><div class="tt">'+t.t+'</div><div class="tl">сотрудников</div>';
+VS.forEach(function(x){if(t.st[x]>0){h+='<div class="sr"><div class="sn"><div class="sb" style="background:'+SC[x]+'"></div>'+x+'</div><div class="sc" style="color:'+SC[x]+'">'+t.st[x]+'</div></div>';}});
+if(t.t>0){h+='<div class="pw"><div class="pb">';VS.forEach(function(x){var p=t.st[x]/t.t*100;if(p>0)h+='<div class="ps" style="width:'+p+'%;background:'+SC[x]+'"></div>';});h+='</div></div>';}
+h+='</div>';
+});
+h+='</div>';
 
-  h+='<div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:8px;margin-bottom:20px">';
-  h+='<div><h1>&#128202; TCM Dashboard v2</h1><div class="subtitle">4 команды · Данные в реальном времени</div></div>';
-  h+='<div style="display:flex;align-items:center;gap:8px">';
-  if(lastUpdate){h+='<div class="status-dot"></div><span class="status-text">'+lastUpdate.toLocaleTimeString("ru-RU")+'</span>';}
-  h+='<button class="btn" onclick="fetchData()">&#128260; Обновить</button></div></div>';
+h+='<div class="lg">';
+VS.forEach(function(x){h+='<div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#888"><div style="width:10px;height:10px;border-radius:3px;background:'+SC[x]+'"></div>'+x+'</div>';});
+h+='</div>';
 
-  /* PLAN-FACT */
-  h+='<div class="section"><div class="section-title">&#128203; Выполнение плана найма</div>';
-  var tPct=tPlan>0?Math.round(gF/tPlan*100):0;
-  var tCol=getPfColor(tPct);
-  h+='<div class="pf-total-card"><div class="pf-total-nums"><div><span class="pf-total-big" style="color:'+tCol+'">'+gF+'</span><span style="color:#666;font-size:18px"> / '+tPlan+'</span></div>';
-  h+='<div class="pf-pct" style="color:'+tCol+'">'+tPct+'%</div></div>';
-  h+='<div style="font-size:13px;color:#888;margin-bottom:8px">Общий факт / план</div>';
-  h+='<div class="pf-bar-bg"><div class="pf-bar-fill" style="width:'+Math.min(tPct,100)+'%;background:'+tCol+'"></div></div></div>';
-  h+='<div class="grid4">';
-  td.forEach(function(t){
-    var p=TEAM_PLAN>0?Math.round(t.fact/TEAM_PLAN*100):0;
-    var c=getPfColor(p);
-    h+='<div class="pf-card"><div class="pf-name">'+esc(t.name)+'</div>';
-    h+='<div class="pf-nums"><span class="pf-fact" style="color:'+c+'">'+t.fact+'</span><span class="pf-plan">/ '+TEAM_PLAN+'</span></div>';
-    h+='<div style="font-size:20px;font-weight:700;color:'+c+'">'+p+'%</div>';
-    h+='<div class="pf-bar-bg"><div class="pf-bar-fill" style="width:'+Math.min(p,100)+'%;background:'+c+'"></div></div></div>';
-  });
-  h+='</div></div>';
-
-  /* EMPLOYEES */
-  h+='<div class="section"><div class="total-number">'+gT+'</div>';
-  h+='<div class="total-label">Всего сотрудников TCM</div>';
-  h+='<div class="total-statuses">';
-  VALID_STATUSES.forEach(function(s){h+='<div class="total-stat"><div class="num" style="color:'+STATUS_COLORS[s]+'">'+gS[s]+'</div><div class="lbl">'+s+'</div></div>';});
-  h+='</div>';
-  if(gT>0){h+='<div class="progress-wrap"><div class="progress-bar">';
-  VALID_STATUSES.forEach(function(s){var p=gS[s]/gT*100;if(p>0)h+='<div class="progress-seg" style="width:'+p+'%;background:'+STATUS_COLORS[s]+'"></div>';});
-  h+='</div></div>';}
-  h+='</div>';
-
-  /* TEAM CARDS */
-  h+='<div class="grid4">';
-  td.forEach(function(t){
-    h+='<div class="card"><div class="team-name">'+esc(t.name)+'</div>';
-    h+='<div class="team-total">'+t.total+'</div><div class="team-total-label">сотрудников</div>';
-    VALID_STATUSES.forEach(function(s){if(t.statuses[s]>0){
-      h+='<div class="status-row"><div class="status-name"><div class="status-badge" style="background:'+STATUS_COLORS[s]+'"></div>'+s+'</div>';
-      h+='<div class="status-count" style="color:'+STATUS_COLORS[s]+'">'+t.statuses[s]+'</div></div>';
-    }});
-    if(t.total>0){h+='<div class="progress-wrap"><div class="progress-bar">';
-    VALID_STATUSES.forEach(function(s){var p=t.statuses[s]/t.total*100;if(p>0)h+='<div class="progress-seg" style="width:'+p+'%;background:'+STATUS_COLORS[s]+'"></div>';});
-    h+='</div></div>';}
-    h+='</div>';
-  });
-  h+='</div>';
-
-  h+='<div class="legend">';
-  VALID_STATUSES.forEach(function(s){h+='<div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#888"><div style="width:10px;height:10px;border-radius:3px;background:'+STATUS_COLORS[s]+'"></div>'+s+'</div>';});
-  h+='</div>';
-
-  document.getElementById("app").innerHTML=h;
+document.getElementById("app").innerHTML=h;
 }
 </script>
 </body>

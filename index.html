@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TCM Dashboard v8</title>
+<title>TCM Dashboard v9</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:system-ui,-apple-system,sans-serif;background:#0f1117;color:#e0e0e0;padding:20px;min-height:100vh}
@@ -65,11 +65,10 @@ h1{font-size:24px;font-weight:700;margin-bottom:4px;color:#fff}
 .dct tr:last-child td{border:none}
 .dct .nm{font-weight:700;text-align:center}
 .dct-tot td{font-weight:700;border-top:2px solid #2a2d3a;font-size:15px}
-.diff-box{margin-top:16px;padding:16px;background:#0f1117;border-radius:12px}
-.diff-title{font-size:14px;font-weight:700;margin-bottom:10px}
-.diff-name{font-size:13px;padding:4px 0;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1a1d27}
-.diff-name:last-child{border:none}
-.diff-status{font-size:11px;padding:2px 8px;border-radius:4px;background:#1a1d27}
+.mmt{width:100%;border-collapse:collapse;margin-top:12px}
+.mmt th{text-align:left;padding:8px 12px;font-size:11px;text-transform:uppercase;color:#666;border-bottom:2px solid #2a2d3a}
+.mmt td{padding:8px 12px;font-size:13px;border-bottom:1px solid #1f2230}
+.mmt tr:last-child td{border:none}
 </style>
 </head>
 <body>
@@ -89,7 +88,7 @@ var TN=["Florencia","Misael","Belen","Jesus"];
 var TP=14;
 var ST=["Working","Test Period","Probation","On-boarding"];
 var FST=["Working","Test Period"];
-var CL={"Working":"#34a853","Test Period":"#b39ddb","Probation":"#fbbc04","On-boarding":"#4fc3f7"};
+var CL={"Working":"#34a853","Test Period":"#b39ddb","Probation":"#fbbc04","On-boarding":"#4fc3f7","Exiting":"#ea4335"};
 
 function doLogin(){
 var v=document.getElementById("pi").value;
@@ -98,9 +97,10 @@ else{document.getElementById("er").style.display="block";document.getElementById
 }
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
 function gc(r,i){if(!r||i>=r.length)return"";return String(r[i]||"").trim()}
-function ms(raw){var s=raw.toLowerCase();if(s.indexOf("exit")>=0)return"X";if(s.indexOf("work")>=0)return"Working";if(s.indexOf("test")>=0)return"Test Period";if(s.indexOf("prob")>=0)return"Probation";if(s.indexOf("on")>=0&&s.indexOf("bo")>=0)return"On-boarding";return"";}
+function msRaw(raw){var s=raw.toLowerCase();if(s.indexOf("exit")>=0)return"Exiting";if(s.indexOf("work")>=0)return"Working";if(s.indexOf("test")>=0)return"Test Period";if(s.indexOf("prob")>=0)return"Probation";if(s.indexOf("on")>=0&&s.indexOf("bo")>=0)return"On-boarding";return"";}
+function msActive(raw){var m=msRaw(raw);if(m==="Exiting")return"";return m;}
 function pcc(p){return p>=90?"#34a853":p>=70?"#fbbc04":"#ea4335"}
-function norm(s){return s.toLowerCase().replace(/[^a-z\u0400-\u04ff]/g,"");}
+function nrm(s){return s.toLowerCase().replace(/[^a-z\u00c0-\u024f]/g,"");}
 
 function loadAll(){
 var app=document.getElementById("app");
@@ -135,14 +135,17 @@ blocks.push({n:TN[j],s:s,e:en});
 
 var td=[],gT=0,gF=0,gS={};
 ST.forEach(function(x){gS[x]=0});
-var elNames=[];
+var elPeople={};
 blocks.forEach(function(b){
 var r={t:0,f:0,st:{}};ST.forEach(function(x){r.st[x]=0});
 for(var i=b.s;i<=b.e&&i<rows.length;i++){
 var nm=gc(rows[i],2),raw=gc(rows[i],3);
-if(!nm)continue;var m=ms(raw);if(!m||m==="X")continue;
-r.t++;r.st[m]++;if(FST.indexOf(m)>=0)r.f++;
-elNames.push({name:nm,status:m,team:b.n});
+if(!nm)continue;
+var mFull=msRaw(raw);
+var mAct=msActive(raw);
+if(!mAct)continue;
+r.t++;r.st[mAct]++;if(FST.indexOf(mAct)>=0)r.f++;
+elPeople[nrm(nm)]={name:nm,status:mAct,team:b.n};
 }
 td.push({n:b.n,t:r.t,f:r.f,st:r.st});gT+=r.t;gF+=r.f;
 ST.forEach(function(x){gS[x]+=r.st[x]});
@@ -153,38 +156,42 @@ for(var i=0;i<rows.length;i++){if(gc(rows[i],0).toLowerCase()==="\u043f\u043b\u0
 
 var dcT={},dcTotals={};
 ST.forEach(function(x){dcTotals[x]=0});
-var tmNames=[];
+var tmPeople={};
 for(var i=1;i<tm.length;i++){
 var raw=gc(tm[i],5);
 if(!raw)continue;
-var m=ms(raw);
-if(!m||m==="X"||ST.indexOf(m)<0)continue;
-dcTotals[m]++;
+var mFull=msRaw(raw);
+if(!mFull)continue;
+var mAct=msActive(raw);
+if(mAct&&ST.indexOf(mAct)>=0)dcTotals[mAct]++;
 var ld=gc(tm[i],0);
 if(!ld)ld="\u0411\u0435\u0437 \u043b\u0438\u0434\u0430";
-var k=ld.charAt(0).toUpperCase()+ld.slice(1).toLowerCase();
-if(!dcT[k]){dcT[k]={};ST.forEach(function(x){dcT[k][x]=0});}
-dcT[k][m]++;
+var kk=ld.charAt(0).toUpperCase()+ld.slice(1).toLowerCase();
+if(mAct&&ST.indexOf(mAct)>=0){
+if(!dcT[kk]){dcT[kk]={};ST.forEach(function(x){dcT[kk][x]=0});}
+dcT[kk][mAct]++;
+}
 var tmName=gc(tm[i],3);
-if(tmName)tmNames.push({name:tmName,status:m,lead:ld});
+if(tmName)tmPeople[nrm(tmName)]={name:tmName,status:mFull,lead:ld};
 }
 
-// Compare names
-var elNorm={};
-elNames.forEach(function(e){elNorm[norm(e.name)]=e;});
-var tmNorm={};
-tmNames.forEach(function(t){tmNorm[norm(t.name)]=t;});
-
-var onlyEL=[];
-elNames.forEach(function(e){if(!tmNorm[norm(e.name)])onlyEL.push(e);});
-var onlyTM=[];
-tmNames.forEach(function(t){if(!elNorm[norm(t.name)])onlyTM.push(t);});
+// Find status mismatches
+var mismatches=[];
+for(var key in elPeople){
+if(tmPeople[key]){
+var elSt=elPeople[key].status;
+var tmSt=tmPeople[key].status;
+if(elSt!==tmSt){
+mismatches.push({name:elPeople[key].name,team:elPeople[key].team,elStatus:elSt,tmStatus:tmSt});
+}
+}
+}
 
 var lu=new Date();
 var h="";
 
 h+='<div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:8px;margin-bottom:20px">';
-h+='<div><h1>&#128202; TCM Dashboard v8</h1><div class="sub">4 команды</div></div>';
+h+='<div><h1>&#128202; TCM Dashboard v9</h1><div class="sub">4 команды</div></div>';
 h+='<div style="display:flex;align-items:center;gap:8px"><div class="dot"></div><span class="stx">'+lu.toLocaleTimeString("ru-RU")+'</span>';
 h+='<button class="btn" onclick="loadAll()">&#128260; Обновить</button></div></div>';
 
@@ -227,7 +234,7 @@ h+='<div class="sec">';
 h+='<div class="sec-t">&#128269; Дабл чек (лист Team)</div>';
 
 if(tm.length<2){
-h+='<div style="color:#ea4335;font-size:14px;padding:12px;background:#1a1d27;border-radius:8px">Лист Team пустой или не найден</div>';
+h+='<div style="color:#ea4335">Лист Team пустой или не найден</div>';
 }else{
 var allKeys=[];
 var knownKeys=[];
@@ -238,7 +245,6 @@ for(var kk in dcT){if(knownKeys.indexOf(kk.toLowerCase())<0)allKeys.push(kk);}
 h+='<div style="overflow-x:auto"><table class="dct"><tr><th>Группа</th>';
 ST.forEach(function(x){h+='<th style="text-align:center;color:'+CL[x]+'">'+x+'</th>';});
 h+='<th style="text-align:center">Всего</th></tr>';
-
 var dG=0,dGS={};ST.forEach(function(x){dGS[x]=0});
 allKeys.forEach(function(tn){
 var d=null;for(var kk in dcT){if(kk.toLowerCase()===tn.toLowerCase()){d=dcT[kk];break;}}
@@ -249,7 +255,6 @@ h+='<tr><td style="font-weight:600">'+esc(tn)+'</td>';
 ST.forEach(function(x){var v=d[x]||0;h+='<td class="nm" style="color:'+(v>0?CL[x]:"#444")+'">'+v+'</td>';});
 h+='<td class="nm" style="color:#fff">'+rt+'</td></tr>';
 });
-
 h+='<tr class="dct-tot"><td>Итого</td>';
 ST.forEach(function(x){h+='<td class="nm" style="color:'+CL[x]+'">'+dGS[x]+'</td>';});
 h+='<td class="nm" style="color:#fff">'+dG+'</td></tr></table></div>';
@@ -261,27 +266,20 @@ if(match)h+='<div style="color:#34a853;font-weight:700;font-size:14px">&#9989; �
 else{var df=gT-dG;h+='<div style="color:#ea4335;font-weight:700;font-size:14px">&#9888; Расхождение: '+(df>0?"+":"")+df+'</div>';}
 h+='</div>';
 
-// Name mismatches
-if(onlyEL.length>0||onlyTM.length>0){
-h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px">';
-
-h+='<div class="diff-box">';
-h+='<div class="diff-title" style="color:#fbbc04">Есть в Employee list, нет в Team ('+onlyEL.length+')</div>';
-if(onlyEL.length===0)h+='<div style="font-size:13px;color:#555">Нет расхождений</div>';
-else onlyEL.forEach(function(e){
-h+='<div class="diff-name"><span>'+esc(e.name)+'</span><span class="diff-status" style="color:'+CL[e.status]+'">'+e.status+' / '+esc(e.team)+'</span></div>';
+// Status mismatches
+if(mismatches.length>0){
+h+='<div style="margin-top:20px;padding:16px;background:#0f1117;border-radius:12px">';
+h+='<div style="font-size:15px;font-weight:700;color:#ea4335;margin-bottom:12px">&#9888; Расхождения в статусах ('+mismatches.length+')</div>';
+h+='<table class="mmt"><tr><th>Имя</th><th>Команда</th><th>Employee list</th><th>Team</th></tr>';
+mismatches.forEach(function(m){
+h+='<tr><td style="font-weight:600">'+esc(m.name)+'</td>';
+h+='<td>'+esc(m.team)+'</td>';
+h+='<td style="color:'+(CL[m.elStatus]||"#fff")+'">'+m.elStatus+'</td>';
+h+='<td style="color:'+(CL[m.tmStatus]||"#fff")+'">'+m.tmStatus+'</td></tr>';
 });
-h+='</div>';
-
-h+='<div class="diff-box">';
-h+='<div class="diff-title" style="color:#4fc3f7">Есть в Team, нет в Employee list ('+onlyTM.length+')</div>';
-if(onlyTM.length===0)h+='<div style="font-size:13px;color:#555">Нет расхождений</div>';
-else onlyTM.forEach(function(t){
-h+='<div class="diff-name"><span>'+esc(t.name)+'</span><span class="diff-status" style="color:'+CL[t.status]+'">'+t.status+' / '+esc(t.lead)+'</span></div>';
-});
-h+='</div>';
-
-h+='</div>';
+h+='</table></div>';
+}else{
+h+='<div style="margin-top:16px;padding:14px 20px;border-radius:12px;background:#0f1117;color:#34a853;font-weight:700;font-size:14px">&#9989; Все статусы совпадают</div>';
 }
 }
 h+='</div>';

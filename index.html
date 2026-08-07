@@ -95,163 +95,33 @@ else{document.getElementById("er").style.display="block";document.getElementById
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
 function gc(r,i){if(!r||i>=r.length)return"";return String(r[i]||"").trim()}
 function ms(raw){var s=raw.toLowerCase();if(s.indexOf("exit")>=0)return"X";if(s.indexOf("work")>=0)return"Working";if(s.indexOf("test")>=0)return"Test Period";if(s.indexOf("prob")>=0)return"Probation";if(s.indexOf("on")>=0&&s.indexOf("bo")>=0)return"On-boarding";return"";}
-function pc(p){return p>=90?"#34a853":p>=70?"#fbbc04":"#ea4335"}
+function pcc(p){return p>=90?"#34a853":p>=70?"#fbbc04":"#ea4335"}
 
 function loadAll(){
 var app=document.getElementById("app");
 app.innerHTML='<div style="text-align:center;padding:80px"><div style="font-size:36px;animation:pulse 1s infinite">&#9203;</div><div style="font-size:18px;color:#888;margin-top:12px">Загрузка...</div></div>';
-
 var url="https://sheets.googleapis.com/v4/spreadsheets/"+SID+"/values:batchGet?ranges="+encodeURIComponent("Employee list!A1:G250")+"&ranges="+encodeURIComponent("Team!A1:H500")+"&key="+AK;
-
 fetch(url).then(function(r){return r.json()}).then(function(json){
-if(json.error){throw new Error(json.error.message);}
-var ranges=json.valueRanges||[];
-var elRaw=ranges[0]&&ranges[0].values?ranges[0].values:[];
-var tmRaw=ranges[1]&&ranges[1].values?ranges[1].values:[];
-doRender(elRaw,tmRaw,"");
+if(json.error)throw new Error(json.error.message);
+var vr=json.valueRanges||[];
+var el=vr[0]&&vr[0].values?vr[0].values:[];
+var tm=vr[1]&&vr[1].values?vr[1].values:[];
+doRender(el,tm);
 }).catch(function(e){
-app.innerHTML='<div style="background:#2a1515;border:1px solid #5a2020;border-radius:12px;padding:20px;margin:20px 0"><div style="font-size:18px;margin-bottom:8px">&#10060; Ошибка</div><div style="color:#f88">'+esc(e.message)+'</div><button class="btn" onclick="loadAll()" style="margin-top:12px">Попробовать снова</button></div>';
+app.innerHTML='<div style="background:#2a1515;border:1px solid #5a2020;border-radius:12px;padding:20px;margin:20px 0"><div style="font-size:18px;margin-bottom:8px">&#10060;</div><div style="color:#f88">'+esc(e.message)+'</div><button class="btn" onclick="loadAll()" style="margin-top:12px">Попробовать снова</button></div>';
 });
 }
 
-function doRender(elRaw,tmRaw,dbg){
-// pad Employee list
+function doRender(elRaw,tmRaw){
 var rows=[];
 for(var i=0;i<250;i++){if(i<elRaw.length){var r=elRaw[i].slice();while(r.length<7)r.push("");rows.push(r);}else rows.push(["","","","","","",""]);}
-
-// pad Team
 var tm=[];
 for(var j=0;j<tmRaw.length;j++){var r2=tmRaw[j].slice();while(r2.length<8)r2.push("");tm.push(r2);}
 
-// find blocks
 var hd=[];
 for(var i=0;i<rows.length;i++){if(gc(rows[i],1).toLowerCase()==="member type")hd.push(i);}
-
 var blocks=[];
 for(var j=0;j<hd.length&&j<TN.length;j++){
 var s=hd[j]+1,en;
 if(j+1<hd.length)en=hd[j+1]-1;
-else{en=rows.length-1;for(var k=s;k<rows.length;k++){if(gc(rows[k],0).toLowerCase()==="\u043f\u043b\u0430\u043d"){en=k-1;break;}}}
-blocks.push({n:TN[j],s:s,e:en});
-}
-
-// parse teams
-var td=[],gT=0,gF=0,gS={};
-ST.forEach(function(x){gS[x]=0});
-blocks.forEach(function(b){
-var r={t:0,f:0,st:{}};ST.forEach(function(x){r.st[x]=0});
-for(var i=b.s;i<=b.e&&i<rows.length;i++){
-var nm=gc(rows[i],2),raw=gc(rows[i],3);
-if(!nm)continue;var m=ms(raw);if(!m||m==="X")continue;
-r.t++;r.st[m]++;if(FS.indexOf(m)>=0)r.f++;
-}
-td.push({n:b.n,t:r.t,f:r.f,st:r.st});gT+=r.t;gF+=r.f;
-ST.forEach(function(x){gS[x]+=r.st[x]});
-});
-
-// plan
-var tP=0;
-for(var i=0;i<rows.length;i++){if(gc(rows[i],0).toLowerCase()==="\u043f\u043b\u0430\u043d"){for(var c=1;c<=5;c++){var v=parseInt(gc(rows[i],c).replace(/[^0-9]/g,""));if(v>0){tP=v;break;}}break;}}
-
-// parse Team sheet: col A=lead, col F=status
-var dcT={},dcS={};
-ST.forEach(function(x){dcS[x]=0});
-for(var i=1;i<tm.length;i++){
-var ld=gc(tm[i],0),raw=gc(tm[i],5);
-if(!raw)continue;var m=ms(raw);if(!m||m==="X"||ST.indexOf(m)<0)continue;
-dcS[m]++;
-if(!ld)continue;
-var k=ld.charAt(0).toUpperCase()+ld.slice(1).toLowerCase();
-if(!dcT[k]){dcT[k]={};ST.forEach(function(x){dcT[k][x]=0});}
-dcT[k][m]++;
-}
-
-var lu=new Date();
-var h="";
-
-h+='<div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:8px;margin-bottom:20px">';
-h+='<div><h1>&#128202; TCM Dashboard v6</h1><div class="sub">4 команды · Обновление каждые 60 сек</div></div>';
-h+='<div style="display:flex;align-items:center;gap:8px"><div class="dot"></div><span class="stx">'+lu.toLocaleTimeString("ru-RU")+'</span>';
-h+='<button class="btn" onclick="loadAll()">&#128260; Обновить</button></div></div>';
-
-// PLAN-FACT
-h+='<div class="sec"><div class="sec-t">&#128203; Выполнение плана найма</div>';
-var tp=tP>0?Math.round(gF/tP*100):0,tc=pc(tp);
-h+='<div class="ptc"><div class="ptn"><div><span class="ptb" style="color:'+tc+'">'+gF+'</span><span style="color:#666;font-size:18px"> / '+tP+'</span></div>';
-h+='<div class="ptp" style="color:'+tc+'">'+tp+'%</div></div>';
-h+='<div style="font-size:13px;color:#888;margin-bottom:8px">Общий факт / план</div>';
-h+='<div class="pbg"><div class="pfl" style="width:'+Math.min(tp,100)+'%;background:'+tc+'"></div></div></div>';
-h+='<div class="g4">';
-td.forEach(function(t){var p=TP>0?Math.round(t.f/TP*100):0,c2=pc(p);
-h+='<div class="pc"><div class="pn">'+esc(t.n)+'</div><div class="pnm"><span class="pf" style="color:'+c2+'">'+t.f+'</span><span class="pp">/ '+TP+'</span></div>';
-h+='<div style="font-size:20px;font-weight:700;color:'+c2+'">'+p+'%</div>';
-h+='<div class="pbg"><div class="pfl" style="width:'+Math.min(p,100)+'%;background:'+c2+'"></div></div></div>';
-});
-h+='</div></div>';
-
-// EMPLOYEES
-h+='<div class="sec"><div class="big">'+gT+'</div><div class="big-l">Всего сотрудников TCM</div>';
-h+='<div class="stats">';
-ST.forEach(function(x){h+='<div class="stat"><div class="n" style="color:'+CL[x]+'">'+gS[x]+'</div><div class="l">'+x+'</div></div>';});
-h+='</div>';
-if(gT>0){h+='<div class="pw"><div class="pb">';ST.forEach(function(x){var p=gS[x]/gT*100;if(p>0)h+='<div class="ps" style="width:'+p+'%;background:'+CL[x]+'"></div>';});h+='</div></div>';}
-h+='</div>';
-
-// TEAM CARDS
-h+='<div class="g4">';
-td.forEach(function(t){
-h+='<div class="cd"><div class="tn">'+esc(t.n)+'</div><div class="tt">'+t.t+'</div><div class="tl">сотрудников</div>';
-ST.forEach(function(x){if(t.st[x]>0){h+='<div class="sr"><div class="sn"><div class="sb" style="background:'+CL[x]+'"></div>'+x+'</div><div class="sc" style="color:'+CL[x]+'">'+t.st[x]+'</div></div>';}});
-if(t.t>0){h+='<div class="pw"><div class="pb">';ST.forEach(function(x){var p=t.st[x]/t.t*100;if(p>0)h+='<div class="ps" style="width:'+p+'%;background:'+CL[x]+'"></div>';});h+='</div></div>';}
-h+='</div>';
-});
-h+='</div>';
-
-// LEGEND
-h+='<div class="lg">';
-ST.forEach(function(x){h+='<div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#888"><div style="width:10px;height:10px;border-radius:3px;background:'+CL[x]+'"></div>'+x+'</div>';});
-h+='</div>';
-
-// DOUBLE CHECK
-h+='<div class="sec">';
-h+='<div class="sec-t">&#128269; Дабл чек (лист Team)</div>';
-h+='<div style="font-size:13px;color:#666;margin-bottom:16px">Сверка с вкладкой Team ('+tm.length+' строк загружено)</div>';
-
-if(tm.length<2){
-h+='<div style="color:#ea4335;font-size:14px;padding:12px;background:#1a1d27;border-radius:8px">Лист Team пустой или не найден</div>';
-}else{
-h+='<div style="overflow-x:auto"><table class="dct"><tr><th>Команда</th>';
-ST.forEach(function(x){h+='<th style="text-align:center;color:'+CL[x]+'">'+x+'</th>';});
-h+='<th style="text-align:center">Всего</th></tr>';
-
-var dG=0,dGS={};ST.forEach(function(x){dGS[x]=0});
-TN.forEach(function(tn){
-var d=null;for(var k in dcT){if(k.toLowerCase()===tn.toLowerCase()){d=dcT[k];break;}}
-if(!d){d={};ST.forEach(function(x){d[x]=0});}
-var rt=0;ST.forEach(function(x){var v=d[x]||0;rt+=v;dGS[x]+=v;});dG+=rt;
-h+='<tr><td style="font-weight:600">'+esc(tn)+'</td>';
-ST.forEach(function(x){var v=d[x]||0;h+='<td class="nm" style="color:'+(v>0?CL[x]:"#444")+'">'+v+'</td>';});
-h+='<td class="nm" style="color:#fff">'+rt+'</td></tr>';
-});
-
-h+='<tr class="dct-tot"><td>Итого</td>';
-ST.forEach(function(x){h+='<td class="nm" style="color:'+CL[x]+'">'+dGS[x]+'</td>';});
-h+='<td class="nm" style="color:#fff">'+dG+'</td></tr></table></div>';
-
-var match=gT===dG;
-h+='<div style="margin-top:16px;padding:14px 20px;border-radius:12px;background:#0f1117;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">';
-h+='<div style="font-size:14px;color:#888">Employee list: <span style="color:#fff;font-weight:700">'+gT+'</span> &#8596; Team: <span style="color:#fff;font-weight:700">'+dG+'</span></div>';
-if(match){h+='<div style="color:#34a853;font-weight:700;font-size:14px">&#9989; Совпадает</div>';}
-else{var df=gT-dG;h+='<div style="color:#ea4335;font-weight:700;font-size:14px">&#9888; Расхождение: '+(df>0?"+":"")+df+'</div>';}
-h+='</div>';
-}
-h+='</div>';
-
-// debug
-h+='<div class="dbg">Блоков команд: '+blocks.length+' | EL строк: '+elRaw.length+' | Team строк: '+tm.length+' | План: '+tP+'</div>';
-
-document.getElementById("app").innerHTML=h;
-}
-</script>
-</body>
-</html>
+else{en=rows.length-1;for(var k=s;k<rows.length;k++){if(gc(rows[k],0).toLowerCase()==="\u043f\u043b\u0430\u043d"){en=k-1;break
